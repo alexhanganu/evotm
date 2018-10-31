@@ -13,8 +13,8 @@ if version_info[0] >=3:
 else:
     from Tkinter import Tk, ttk, Frame, Label, Button, Menu, StringVar
 
-from tm.lib.db import database
-from tm.lib import update
+from lib import database
+from lib import update
 
 MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
@@ -261,36 +261,36 @@ class TMApp(Frame):
         self.button_dict[self._taskclosed].configure(bg = "green")
 
     def NewTask(self):
-        from tm.lib import task_config
+        from lib import task_config
         task_config.NewTask()
 
     def EditTask(self):
-        from tm.lib import task_config
+        from lib import task_config
         task_config.EditTask()
 
     def ActivateTask(self):
-        from tm.lib import task_config
+        from lib import task_config
         task_config.ActivateTask()
 
     def SetEdit_MinimalDuration_Task(self):
-        from tm.lib import task_config
+        from lib import task_config
         task_config.SetEdit_MinimalDuration_Task()
 
     def SetDuration_MainDailyGroups(self):
-        from tm.lib import task_config
+        from lib import task_config
         task_config.SetDuration_MainDailyGroups()
 
     def Edit_Task_Duration(self):
-        from tm.lib import task_config
+        from lib import task_config
         task_config.Edit_Task_Duration()
 
     def Show_Stats(self):
-        from tm.lib import make_stats
+        from lib import make_stats
         make_stats.Show_Stats(PATHapp)
         database.retrieve_all_data('C:/Users/Alex/Desktop/db_Database.csv')
 
     def popupmsg(self, msg):
-        from tm.lib import menu
+        from lib import menu
         menu.popupmsg(msg)
 
 def on_closing():
