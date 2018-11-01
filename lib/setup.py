@@ -4,7 +4,10 @@
 from os import path
 from sys import platform
 
-def setup(PATHmain):
+PATHapp = getcwd().replace(path.sep, '/')+'/tm/'
+
+
+def setup():
     from os import environ, system
 
     try:
@@ -16,4 +19,4 @@ def setup(PATHmain):
     if platform == 'win32':
         PATH_Desktop=((environ['USERPROFILE']).replace('\\','/')+'/Desktop/')
         with open(PATH_Desktop+'run_tm.bat','w') as f:
-            f.write('cd '+PATHmain.replace('/','\\')+'\n'+'start pythonw tm.pyw')
+            f.write('cd '+PATHapp+'\n'+'start pythonw tm.pyw')

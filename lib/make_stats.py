@@ -1,10 +1,10 @@
 import pandas as pd
 import time
-from tm.lib.db import database
+from . import database
 
 class Show_Stats():
 
-    def __init__(self, PATHapp):
+    def __init__(self):
         conn = database.__connect_db__()
         c = conn.cursor()
         frame = [{'date':time.strftime('%Y%m%d', time.localtime())}]

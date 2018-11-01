@@ -6,10 +6,8 @@ import pandas as pd
 from time import strftime, localtime, gmtime
 import pathlib 
 
-PATHdb = str(pathlib.Path().absolute()).replace('\\','/')+'/tm/lib/db/'
-
 def __connect_db__():
-    conn = connect(PATHdb+environ['COMPUTERNAME']+'.db', check_same_thread=False)
+    conn = connect(str(pathlib.Path().absolute())+'/lib/'+environ['COMPUTERNAME']+'.db', check_same_thread=False)
     try:
         __get_table_(conn)
     except OperationalError:
@@ -101,12 +99,15 @@ def get_tasks_for_table_(table_name):
     cursor = conn.execute('''SELECT * FROM {0}'''.format(table_name,))
     all_data_for_table = cursor.fetchall()
     table = {}
-    tables_with_lists = ['MainDailyGroups','PausedTasks','ArchivedTasks','Projects']
+    tables_with_lists = ['MainDailyGroups','PausedTasks','ArchivedTasks','Projects',]
     for Group in all_data_for_table:
         if table_name in tables_with_lists:
             if Group[0] not in table:
                 table[Group[0]] = []
             table[Group[0]].append(Group[1])
+        elif table_name == 'Dailydatabase':
+            table[Group[2]] = []
+            table[Group[2]].append(Group)
         else:
             table[Group[0]] = Group[1]
     return table

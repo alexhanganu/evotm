@@ -3,10 +3,8 @@
 
 from os import listdir, getcwd, path
 from sys import version_info, platform
-from datetime import date
+from datetime import date, datetime
 import time
-
-PATHapp = getcwd().replace(path.sep, '/')+'/tm/'
 
 if version_info[0] >=3:
     from tkinter import Tk, ttk, Frame, Label, Button, Menu, StringVar
@@ -57,7 +55,7 @@ class TMApp(Frame):
         self._taskclosed = ['']
 
 
-        update.send_to_thread_update()
+        self.check_today()
 
         self.button_dict = {}
         self.button_days_task_active_dict = {}
@@ -73,6 +71,19 @@ class TMApp(Frame):
 
         self.WidgetTaskDuration()
         self.SetProjectDuration()
+
+    def check_today(self):
+        today = datetime.strptime(datetime.today().strftime("%Y%m%d"), "%Y%m%d").strftime("%Y%m%d")
+        d_tasks = database.get_tasks_for_table_('Dailydatabase')
+        ls_tasks = []
+        for key in d_tasks:
+            ls_tasks.append(key)
+        if d_tasks[ls_tasks[0]][0][1] != today:
+            print('starting update', d_tasks[ls_tasks[0]][0][1], today)
+            database.Update_DB()
+            update.send_to_thread_update()
+
+
 
     def SetProjectDuration(self):
         if self._running == 1:
@@ -286,7 +297,7 @@ class TMApp(Frame):
 
     def Show_Stats(self):
         from lib import make_stats
-        make_stats.Show_Stats(PATHapp)
+        make_stats.Show_Stats()
         database.retrieve_all_data('C:/Users/Alex/Desktop/db_Database.csv')
 
     def popupmsg(self, msg):

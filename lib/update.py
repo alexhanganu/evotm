@@ -1,13 +1,13 @@
 from time import strptime, strftime
 from datetime import datetime, timedelta
 
-import database
+from . import database
 
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
 Date_deadline = database.get_tasks_for_table_('Date_deadline')
 MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
 
-print('     Days_task_active:',Days_task_active,'\n')
+# print('     Days_task_active:',Days_task_active,'\n')
 
 def send_to_thread_update():
     start_update = UpdateDaysTaskActive()
@@ -32,13 +32,13 @@ class UpdateDaysTaskActive():
                 elif str(data[0][1]) == previous_day_start and str(data[0][3])<MinDailyTaskDuration[task] or str(data[0][1]) != previous_day_start:
                     days_task_active = self.count_days(data, previous_day_start, False, MinDailyTaskDuration[task])
                 if task in Days_task_active:
-                    print(days_task_active, task)
+                    # print(days_task_active, task)
                     database.__update_table__('Days_task_active','days_task_active_id',days_task_active, 'task_id',task)
                 else:
                     print('inserting in db 0 days active', task)
                     database.__insert_in_table__('Days_task_active',task, 0)
             else:
-                print(len(data), task)
+                print(len(data),' is zero', task)
 
 
     def count_days(self, data, previous_day, count, min_duration):

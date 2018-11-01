@@ -2,9 +2,9 @@ from tkinter import Tk, ttk, Label, Button, Entry, Listbox, EXTENDED, END, simpl
 from os import listdir, rename, path
 import time, re
 
-from tm.lib.db import database
+from . import database
 
-from tm.lib import tkSimpleDialog
+from . import tkSimpleDialog
 MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
 Projects = database.get_tasks_for_table_('Projects')
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
@@ -192,7 +192,6 @@ class EditTask():
         ttk.Button(self.main, text="Update", command=self.Update).grid(row=4, column=0,)
         ttk.Button(self.main, text="Pause", command=self.Pause).grid(row=3, column=1)
         ttk.Button(self.main, text="Archive", command=self.Archive).grid(row=4, column=1)
-        from tm.lib.db.min_daily_task_duration import MinDailyTaskDuration
 
     def Update(self):
         ls_Tasks2Update = list()
