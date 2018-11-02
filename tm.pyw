@@ -70,19 +70,19 @@ class TMApp(Frame):
             self.ListButtons()
 
         self.WidgetTaskDuration()
-        self.SetProjectDuration()
+        # self.SetProjectDuration()
 
     def check_today(self):
         today = datetime.strptime(datetime.today().strftime("%Y%m%d"), "%Y%m%d").strftime("%Y%m%d")
         d_tasks = database.get_tasks_for_table_('Dailydatabase')
         ls_tasks = []
-        for key in d_tasks:
-            ls_tasks.append(key)
-        if d_tasks[ls_tasks[0]][0][1] != today:
-            print('starting update', d_tasks[ls_tasks[0]][0][1], today)
-            database.Update_DB()
-            update.send_to_thread_update()
-
+        if len(d_tasks)>0:
+            for key in d_tasks:
+                ls_tasks.append(key)
+            if d_tasks[ls_tasks[0]][0][1] != today:
+                print('starting update', d_tasks[ls_tasks[0]][0][1], today)
+                database.Update_DB()
+                update.send_to_thread_update()
 
 
     def SetProjectDuration(self):
@@ -149,19 +149,26 @@ class TMApp(Frame):
 
 
     def WidgetTaskDuration(self):
-        if len(MainDailyGroups['Personal'])>0 and len(MainDailyGroups['Job'])>0:
-            widget_task_text_row_nr = self.row_nr
-            widget_task_variable_row_nr = self.row_nr
-            widget_task_variable_col_nr = self.nr_of_col_4_widget
-            row_button = self.row_nr            
-            col_button = self.col_nr_4_stop_button
-        elif len(MainDailyGroups['Personal'])<1 and len(MainDailyGroups['Job'])<1:
-            widget_task_text_row_nr = self.row_nr
-            widget_task_variable_row_nr = self.row_nr+1
-            widget_task_variable_col_nr = 0
-            row_button = self.row_nr+1
-            col_button = self.col_nr_4_stop_button-1
-	
+        if len(MainDailyGroups)>0:
+            if len(MainDailyGroups['Personal'])>0 and len(MainDailyGroups['Job'])>0:
+                widget_task_text_row_nr = self.row_nr
+                widget_task_variable_row_nr = self.row_nr
+                widget_task_variable_col_nr = self.nr_of_col_4_widget
+                row_button = self.row_nr            
+                col_button = self.col_nr_4_stop_button
+            elif len(MainDailyGroups['Personal'])<1 and len(MainDailyGroups['Job'])<1:
+                widget_task_text_row_nr = self.row_nr
+                widget_task_variable_row_nr = self.row_nr+1
+                widget_task_variable_col_nr = 0
+                row_button = self.row_nr+1
+                col_button = self.col_nr_4_stop_button-1
+        else:
+                widget_task_text_row_nr = self.row_nr
+                widget_task_variable_row_nr = self.row_nr+1
+                widget_task_variable_col_nr = 0
+                row_button = self.row_nr+1
+                col_button = self.col_nr_4_stop_button-1
+
         Label(self, textvariable=self._TaskTotalDailyDuration).grid(row=widget_task_text_row_nr, column=0)
 
         Button(self, text='Stop', command=self.Stop).grid(row=row_button, column=col_button)
