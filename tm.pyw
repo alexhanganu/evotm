@@ -21,8 +21,7 @@ MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
 ls_MainDailyGroups_tmp = []
 for key in MainDailyGroups:
     ls_MainDailyGroups_tmp.append(key)
-ls_sorting_order = ['Job','Personal','DailyTasks']
-ls_MainDailyGroups = sorted(ls_MainDailyGroups_tmp, key=lambda x: ls_sorting_order.index(x))
+ls_MainDailyGroups = sorted(ls_MainDailyGroups_tmp)
 
 
 class TMApp(Frame):
@@ -149,14 +148,13 @@ class TMApp(Frame):
 
 
     def WidgetTaskDuration(self):
-        if len(MainDailyGroups)>0:
-            if len(MainDailyGroups['Personal'])>0 and len(MainDailyGroups['Job'])>0:
+        if len(ls_MainDailyGroups)>2:
                 widget_task_text_row_nr = self.row_nr
                 widget_task_variable_row_nr = self.row_nr
                 widget_task_variable_col_nr = self.nr_of_col_4_widget
                 row_button = self.row_nr            
                 col_button = self.col_nr_4_stop_button
-            elif len(MainDailyGroups['Personal'])<1 and len(MainDailyGroups['Job'])<1:
+        elif len(ls_MainDailyGroups)==1:
                 widget_task_text_row_nr = self.row_nr
                 widget_task_variable_row_nr = self.row_nr+1
                 widget_task_variable_col_nr = 0

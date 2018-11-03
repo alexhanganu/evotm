@@ -110,11 +110,8 @@ def get_tasks_for_table_(table_name):
             table[Group[2]].append(Group)
         else:
             table[Group[0]] = Group[1]
-    print(table_name, table)
     if table_name == 'MainDailyGroups' and len(table)==0:
-        print(table_name, len(table))
-        table = {['tab1']:[]}
-    print(table_name, table)
+        table['tab1']=[]
     return table
 
 
