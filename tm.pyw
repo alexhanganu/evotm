@@ -47,8 +47,8 @@ class TMApp(Frame):
         self._TimeLeftDailyMainGroup = StringVar()
         self._TaskTotalDailyDuration = StringVar()
         self._TotalProjectDuration = ['']
-        self.Project_Duration_Now = {'Job':StringVar(),
-		'Personal':StringVar()}
+        for key in MainDailyGroups:
+            self.Project_Duration_Now = {key:StringVar(),}
 
         self._taskrunning = ['']
         self._Projectrunning = ['']
@@ -70,7 +70,7 @@ class TMApp(Frame):
             self.ListButtons()
 
         self.WidgetTaskDuration()
-        # self.SetProjectDuration()
+        self.SetProjectDuration()
 
     def check_today(self):
         today = datetime.strptime(datetime.today().strftime("%Y%m%d"), "%Y%m%d").strftime("%Y%m%d")
