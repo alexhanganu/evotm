@@ -30,7 +30,7 @@ def get_tasks_duration_for_Dailydatabase():
     conn = __connect_db__()
     table = {}
     for task in conn.execute('''SELECT task_id FROM Dailydatabase''').fetchall():
-        table[task] = conn.execute('''SELECT duration_id FROM Dailydatabase''').fetchone()[0]
+        table[task[0]] = str(strftime('%H:%M:%S', gmtime(float(conn.execute('''SELECT duration_id FROM Dailydatabase WHERE task_id="{0}" '''.format(task[0])).fetchone()[0]))))
     return table
 
 

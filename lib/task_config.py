@@ -442,17 +442,12 @@ class Edit_Task_Duration():
                     self.width = len(item)
         self.listbox.config(width=self.width, height=10)#, justify=CENTER)
 
-        today_tasks_and_durations = {}
-        all_tasks = database.get_tasks_duration_for_Dailydatabase()
-        for task in all_tasks:
-            today_tasks_and_durations[task[0]] = str(time.strftime('%H:%M:%S', time.gmtime(float(all_tasks[task]))))
-        print('READ THIS',today_tasks_and_durations)
-
         ttk.Label(self.main, text='Tasks Used today').grid(row=0, column=1)
         self.today_tasks_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
         self.today_tasks_listbox.grid(row=1, column=1)
         self.today_tasks_width = 10
 
+        today_tasks_and_durations = database.get_tasks_duration_for_Dailydatabase()
         if len(today_tasks_and_durations)>0:
             for task_active_today in today_tasks_and_durations:
                     self.today_tasks_listbox.insert(END, task_active_today+'    '+today_tasks_and_durations[task_active_today])
