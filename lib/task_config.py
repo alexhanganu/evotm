@@ -184,11 +184,6 @@ class EditTask():
         self.date_deadline = 'no date'        
         ttk.Button(self.main, text="Set deadline", command=self.SetDate).grid(row=3, column=0)
 
-        # ttk.Label(self.main, text='Set minimal duration').grid(row=4, column=0)
-        # self.EntryMinimumDailyTaskDuration = Entry(self.main)
-        # self.EntryMinimumDailyTaskDuration.grid(row=4, column=1)
-        # self.EntryMinimumDailyTaskDuration.insert(0, 'minutes, mm')
-
         ttk.Button(self.main, text="Update", command=self.Update).grid(row=4, column=0,)
         ttk.Button(self.main, text="Pause", command=self.Pause).grid(row=3, column=1)
         ttk.Button(self.main, text="Archive", command=self.Archive).grid(row=4, column=1)
@@ -251,7 +246,6 @@ class EditTask():
             if Task2Pause in MinDailyTaskDuration:
                 database.__update_table__('MinDailyTaskDuration','task_id',RenameTask,'task_id', Task2Pause)
                 MinDailyTaskDuration[RenameTask] = MinDailyTaskDuration[Task2Pause]
-            # self.ComputeTemporaryProjectDuration(Task2Pause, project)       
         self.main.destroy()
 
     def Archive(self):
@@ -272,29 +266,7 @@ class EditTask():
                 database.__delete_from_table__('Date_deadline',Task2Archive, Date_deadline[Task2Archive])
             if Task2Archive in MinDailyTaskDuration:
                 database.__delete_from_table__('MinDailyTaskDuration',Task2Archive, MinDailyTaskDuration[Task2Archive])
-            # self.ComputeTemporaryProjectDuration(Task2Archive, project)
         self.main.destroy()
-
-    def ComputeTemporaryProjectDuration(self, task, project):
-        import shutil, json
-        from os import listdir
-        for file in listdir(self.PATHapp+'proj/'):
-            if task in file:
-                with open(self.PATHapp+'proj/'+file,'r') as f:
-                    for line in f:
-                        duration = line.strip('\n')
-                shutil.move(self.PATHapp+'proj/'+file, self.PATHapp+'archive/'+file)
-
-
-                if path.exists(self.PATHapp+'proj/'+str(time.strftime('%Y%m%d', time.localtime()))+project+'_tmp.json'):
-                    with open(self.PATHapp+'proj/'+str(time.strftime('%Y%m%d', time.localtime()))+project+'_tmp.json','r') as f:
-                        for line in f:
-                            newvalue = float(line)+int(duration)
-                else:
-                    newvalue = int(duration)
-                with open(self.PATHapp+'proj/'+str(time.strftime('%Y%m%d', time.localtime()))+project+'_tmp.json','w') as f:
-                    json.dump(newvalue, f)
-
 
     def SetDate(self):
         cd = CalendarDialog(self.main)
@@ -302,24 +274,8 @@ class EditTask():
             self.date_deadline = str(cd.result)[:10].replace('-','')
         else:
             print('')
-            self.date_deadline = 'no date'        
+            self.date_deadline = 'no date'
 
-
-    # def Update_order(self, MainDailyGroups):
-        # for key in MainDailyGroups:
-            # tmp_ls = MainDailyGroups[key]
-            # for task2sort in MainDailyGroups[key]:
-                # if task2sort in MinDailyTaskDuration:
-                    # task2sort_value = MinDailyTaskDuration[task2sort]
-                    # for task2change in tmp_ls:
-                        # if task2change in MinDailyTaskDuration and task2change != task2sort:
-                            # task2change_value = MinDailyTaskDuration[task2change]
-                            # if task2change_value < task2sort_value and tmp_ls.index(task2change) >  tmp_ls.index(task2sort):
-                                # tmp_ls.remove(task2change)
-                                # tmp_ls.insert(tmp_ls.index(task2sort), task2change)
-                        # elif task2sort != task2change and tmp_ls.index(task2change) <  tmp_ls.index(task2sort):
-                                # tmp_ls.remove(task2sort)
-                                # tmp_ls.insert(tmp_ls.index(task2change), task2sort)
 
 class ActivateTask():
     def __init__(self):
@@ -355,10 +311,11 @@ class ActivateTask():
             database.__delete_from_table__('PausedTasks',project, Task2Activate)
         self.main.destroy()
 
+
 class SetEdit_MinimalDuration_Task():
     def __init__(self):
         self.main = Tk()
-        self.main.title("Set/Edit Minimal Task Duration")
+        self.main.title("Minimal Task Duration Set/Edit")
         
         ttk.Label(self.main, text='Active Tasks').grid(row=0, column=0)    
         self.listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
@@ -406,29 +363,13 @@ class SetEdit_MinimalDuration_Task():
                         database.__insert_in_table__('Days_task_active',Task2Edit, 0)
                     else:
                         database.__update_table__('MinDailyTaskDuration','min_duration_id', str(duration), 'task_id', Task2Edit)
-
-    def Update_order(self, MainDailyGroups):
-        for key in MainDailyGroups:
-            tmp_ls = MainDailyGroups[key]
-            for task2sort in MainDailyGroups[key]:
-                if task2sort in MinDailyTaskDuration:
-                    task2sort_value = MinDailyTaskDuration[task2sort]
-                    for task2change in tmp_ls:
-                        if task2change in MinDailyTaskDuration and task2change != task2sort:
-                            task2change_value = MinDailyTaskDuration[task2change]
-                            if task2change_value < task2sort_value and tmp_ls.index(task2change) >  tmp_ls.index(task2sort):
-                                tmp_ls.remove(task2change)
-                                tmp_ls.insert(tmp_ls.index(task2sort), task2change)
-                        elif task2sort != task2change and tmp_ls.index(task2change) <  tmp_ls.index(task2sort):
-                                tmp_ls.remove(task2sort)
-                                tmp_ls.insert(tmp_ls.index(task2change), task2sort)
-            MainDailyGroups[key] = tmp_ls
         self.main.destroy()
+
 
 class Edit_Task_Duration():
     def __init__(self):
         self.main = Tk()
-        self.main.title("Edit Task Duration")
+        self.main.title("Task Duration")
         
         ttk.Label(self.main, text='Active Tasks').grid(row=0, column=0)    
         self.listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
@@ -497,63 +438,3 @@ class Edit_Task_Duration():
             database.SetDailyTaskDuration(task, duration2set)
 
         self.main.destroy()
-
-
-class SetDuration_MainDailyGroups():
-    def __init__(self):
-        self.main = Tk()
-        self.main.title("Set Duration for Main Daily Groups")
-        
-        ttk.Label(self.main, text='Main Daily Groups').grid(row=0, column=0, columnspan=2)
-        self.maindaily_listbox = Listbox(self.main, selectmode=SINGLE)
-        self.maindaily_listbox.grid(row=1, column=0, columnspan=2)
-        self.width = 5
-        self.ls = []
-        for project in MainDailyGroups:
-            if project not in self.ls:
-                self.ls.append(project)
-        for item in self.ls:
-            self.maindaily_listbox.insert(END, item)
-            if len(item)>self.width:
-                self.width = len(item)
-        self.maindaily_listbox.config(width=self.width, height=len(self.ls))#, justify=CENTER)
-        #scrollbar = Scrollbar(self.maindaily_listbox, orient=VERTICAL)
-        #scrollbar.grid(column=1)#, sticky=N+S)
-
-        ttk.Label(self.main, text='Enter duration:').grid(row=2, column=0, columnspan=2)
-        self.EntryDurationHours = Entry(self.main)
-        self.EntryDurationHours.grid(row=3, column=0)
-        self.EntryDurationHours.insert(0, 'hours')
-        self.EntryDurationMinutes = Entry(self.main)
-        self.EntryDurationMinutes.grid(row=3, column=1)
-        self.EntryDurationMinutes.insert(0, 'minutes')
-
-        ttk.Button(self.main, text="Submit", command=self.select).grid(row=4, column=0, columnspan=2)
-
-    def select(self):
-        DurationHours2Get = str(self.EntryDurationHours.get())
-        DurationMinutes2Get = str(self.EntryDurationMinutes.get())
-        reslist = list()
-        if DurationHours2Get != 'hours':
-            Duration2Add = (int(DurationHours2Get)*3600)+(int(DurationMinutes2Get)*60)
-            selected_maindaily = self.maindaily_listbox.curselection()
-            for i in selected_maindaily:
-                entrada = self.maindaily_listbox.get(i)
-                reslist.append(entrada)
-            for maindailygroup in reslist:
-                database.__insert_in_table__('MainDailyGroupDuration',maindailygroup, Duration2Add)
-
-        else:
-            pass
-
-        self.main.destroy()
-
-
-def popupmsg(msg):
-    popup = Tk()
-    popup.wm_title("!")
-    label = Label(popup, text=msg)
-    label.pack(side="top", fill="x", pady=10)
-    B1 = Button(popup, text="Okay", command = popup.destroy)
-    B1.pack()
-    popup.mainloop()
