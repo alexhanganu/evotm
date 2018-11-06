@@ -14,6 +14,8 @@ def setup():
         import pandas
     except ImportError:
         system('pip3 install pandas')
+    system('pip3 install oauth2client')
+    system('pip3 install --upgrade google-api-python-client')
     if platform == 'darwin' or platform == 'linux' or platform == 'linux2':
        PATH_Desktop = path.expanduser('~')+'/Desktop/'
     if platform == 'win32':
