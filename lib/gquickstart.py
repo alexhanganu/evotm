@@ -5,13 +5,13 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+SCOPES = 'https://www.googleapis.com/auth/calendar'#.readonly'
 
 def main():
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
-    store = file.Storage('token.json')
+    store = file.Storage('client_id.json')
     creds = store.get()
     if not creds or creds.invalid:
         flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
@@ -29,8 +29,9 @@ def main():
     if not events:
         print('No upcoming events found.')
     for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        print(event['summary'])
+        print('     start:', event['start'].get('dateTime', event['start'].get('date')))
+        print('     end:', event['end'].get('dateTime', event['start'].get('date')))
 
 if __name__ == '__main__':
     main()
