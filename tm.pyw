@@ -248,6 +248,7 @@ class TMApp(Frame):
         self.ProjectDuration(self._Projectrunning)
         self.SetProjectDuration()
         self._taskrunning = task
+        database.UpdateStartTime(self._taskrunning, time.strftime('%H:%M:%S', time.localtime(time.time())))
         self.Start()
         self.button_dict[task].configure(bg = "green")
         self._taskclosed = self._taskrunning

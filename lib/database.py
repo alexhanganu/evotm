@@ -18,11 +18,15 @@ def __connect_db__():
 def Update_DB():
     conn = __connect_db__()
     for row in conn.execute('''SELECT * FROM Dailydatabase''').fetchall():
-        data = [(row[0], row[1], row[2], str(strftime('%H:%M:%S', gmtime(float(row[3])))))]
-        date = row[1]
+        task = row[2]
+        start_time = ''
+        if conn.execute('''select starttime_id from DailyStartTime where task_id="{0}" '''.format(task,)).fetchone()[0] != 0:
+            start_time = conn.execute('''select starttime_id from DailyStartTime where task_id="{0}" '''.format(task,)).fetchone()[0]
+        data = [(row[0], row[1], task, str(strftime('%H:%M:%S', gmtime(float(row[3])))), start_time)]
         print('inserting into Database values: ',data)
-        conn.executemany('''INSERT INTO Database VALUES(?,?,?,?)''', data)
+        conn.executemany('''INSERT INTO Database VALUES(?,?,?,?,?)''', data)
     conn.execute('''DELETE FROM Dailydatabase''')
+    conn.execute('''DELETE FROM DailyStartTime''')
     conn.commit()
 
 
@@ -41,9 +45,18 @@ def UpdateDailyTask(task, duration):
         new_time = time_in_db+ duration
         conn.execute('''UPDATE Dailydatabase SET duration_id = {0} WHERE task_id= "{1}"'''.format(new_time, task))
     else:
-        new_time = duration
-        data = [(str(strftime('%a', localtime())), str(strftime('%Y%m%d', localtime())), task, new_time)]
+        data = [(str(strftime('%a', localtime())), str(strftime('%Y%m%d', localtime())), task, duration)]
         conn.executemany('''INSERT INTO Dailydatabase VALUES(?,?,?,?)''', data)
+    conn.commit()
+
+
+def UpdateStartTime(task, starttime):
+    conn = __connect_db__()
+    if conn.execute('''select count(*) from DailyStartTime where task_id="{0}" '''.format(task,)).fetchone()[0] != 0:
+        conn.execute('''UPDATE DailyStartTime SET starttime_id = "{0}" WHERE task_id= "{1}"'''.format(starttime, task))
+    else:
+        data = [(str(strftime('%Y%m%d', localtime())), task, starttime)]
+        conn.executemany('''INSERT INTO DailyStartTime VALUES(?,?,?)''', data)
     conn.commit()
 
 
@@ -190,7 +203,7 @@ def __get_table_(conn):
 
 
 def __create_table__(conn):
-    conn.execute('''CREATE TABLE if not exists Database (day_of_week_id, date_id, task_id, duration_id)''')
+    conn.execute('''CREATE TABLE if not exists Database (day_of_week_id, date_id, task_id, duration_id, starttime_id)''')
     conn.execute('''CREATE TABLE if not exists MainDailyGroups (dailygroup_id, task_id)''')
     conn.execute('''CREATE TABLE if not exists Projects (project_id, task_id)''')
     conn.execute('''CREATE TABLE if not exists Days_task_active (task_id, days_task_active_id)''')
@@ -199,5 +212,6 @@ def __create_table__(conn):
     conn.execute('''CREATE TABLE if not exists PausedTasks (dailygroup_id, task_id)''')
     conn.execute('''CREATE TABLE if not exists ArchivedTasks (dailygroup_id, task_id)''')
     conn.execute('''CREATE TABLE if not exists Dailydatabase (day_of_week_id, date_id, task_id, duration_id)''')
+    conn.execute('''CREATE TABLE if not exists DailyStartTime (date_id, task_id, starttime_id)''')
     conn.execute('''CREATE TABLE if not exists MainDailyGroups_bg_color (dailygroup_id, color_id)''')
     conn.commit()
