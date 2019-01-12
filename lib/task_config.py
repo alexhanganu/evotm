@@ -244,8 +244,7 @@ class EditTask():
             database.__delete_from_table__('MainDailyGroups',project, Task2Pause)
             database.__insert_in_table__('PausedTasks',project, Task2Pause)
             if Task2Pause in MinDailyTaskDuration:
-                database.__update_table__('MinDailyTaskDuration','task_id',RenameTask,'task_id', Task2Pause)
-                MinDailyTaskDuration[RenameTask] = MinDailyTaskDuration[Task2Pause]
+                database.__delete_from_table__('MinDailyTaskDuration',project, Task2Pause)
         self.main.destroy()
 
     def Archive(self):
