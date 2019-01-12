@@ -1,6 +1,5 @@
-import json
 from sqlite3 import connect, OperationalError
-from os import environ, listdir, path
+from os import environ, path
 import pandas.io.sql as pdsql
 import pandas as pd
 from time import strftime, localtime, gmtime
@@ -20,7 +19,7 @@ def Update_DB():
     for row in conn.execute('''SELECT * FROM Dailydatabase''').fetchall():
         task = row[2]
         start_time = ''
-        if conn.execute('''select starttime_id from DailyStartTime where task_id="{0}" '''.format(task,)).fetchone()[0] != 0:
+        if conn.execute('''select count(*) from DailyStartTime where task_id="{0}" '''.format(task,)).fetchone()[0] != 0:
             start_time = conn.execute('''select starttime_id from DailyStartTime where task_id="{0}" '''.format(task,)).fetchone()[0]
         data = [(row[0], row[1], task, str(strftime('%H:%M:%S', gmtime(float(row[3])))), start_time)]
         print('inserting into Database values: ',data)
@@ -110,11 +109,18 @@ def task_and_date_in_table(table, task, date):
 def get_tasks_for_table_(table_name):
     conn = __connect_db__()
     cursor = conn.execute('''SELECT * FROM {0}'''.format(table_name,))
-    all_data_for_table = cursor.fetchall()
+    all_data_for_table = cursor.fetchall()        
     table = {}
-    tables_with_lists = ['MainDailyGroups','PausedTasks','ArchivedTasks','Projects',]
+    if table_name == 'MainDailyGroups':
+        for tab in conn.execute('''SELECT * FROM "Tabs" '''):
+            table[tab] = []
     for Group in all_data_for_table:
-        if table_name in tables_with_lists:
+        if table_name == 'MainDailyGroups':
+            if Group[0] in table:
+                table[Group[0]].append(Group[1])
+            else:
+                print('ERROR! ',Group[0],' missing from list of tabs')
+        elif table_name in ['PausedTasks','ArchivedTasks','Projects']:
             if Group[0] not in table:
                 table[Group[0]] = []
             table[Group[0]].append(Group[1])
@@ -123,8 +129,6 @@ def get_tasks_for_table_(table_name):
             table[Group[2]].append(Group)
         else:
             table[Group[0]] = Group[1]
-    if table_name == 'MainDailyGroups' and len(table)==0:
-        table['tab1']=[]
     return table
 
 
@@ -180,6 +184,9 @@ def __delete_from_table__(table, value1, value2):
     elif table == 'MainDailyGroups_bg_color':
         col1 = 'dailygroup_id'
         col2 = 'color_id'
+    elif table == 'Tabs':
+        col1 = 'tab_id'
+        col2 = 'position'
     conn.execute("DELETE from {0} WHERE {1}='{2}' AND {3}='{4}'".format(table, col1, value1, col2, value2))
     conn.commit()
 
@@ -203,6 +210,7 @@ def __get_table_(conn):
 
 
 def __create_table__(conn):
+    conn.execute('''CREATE TABLE if not exists Tabs (tab_id, position)''')
     conn.execute('''CREATE TABLE if not exists Database (day_of_week_id, date_id, task_id, duration_id, starttime_id)''')
     conn.execute('''CREATE TABLE if not exists MainDailyGroups (dailygroup_id, task_id)''')
     conn.execute('''CREATE TABLE if not exists Projects (project_id, task_id)''')
@@ -214,4 +222,7 @@ def __create_table__(conn):
     conn.execute('''CREATE TABLE if not exists Dailydatabase (day_of_week_id, date_id, task_id, duration_id)''')
     conn.execute('''CREATE TABLE if not exists DailyStartTime (date_id, task_id, starttime_id)''')
     conn.execute('''CREATE TABLE if not exists MainDailyGroups_bg_color (dailygroup_id, color_id)''')
+    if conn.execute('''select count(*) from Tabs ''').fetchone()[0] == 0:
+        print('len Tabs is zero, creating tab')
+        conn.execute('''INSERT INTO Tabs VALUES(?,?)''', ['tab','0'])
     conn.commit()
