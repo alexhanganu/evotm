@@ -36,6 +36,7 @@ class TMApp(Frame):
         filemenu.add_command(label="Unpause task", command = lambda: self.ActivateTask())
         filemenu.add_command(label="New task", command = lambda: self.NewTask())
         filemenu.add_command(label="Set/Edit Task Minimal Duration", command = lambda: self.SetEdit_MinimalDuration_Task())
+        filemenu.add_command(label="Configure Tabs", command = lambda: self.Configure())
         filemenu.add_command(label="Statistics", command=lambda: self.Show_Stats())
         self.master.config(menu=menubar)
 
@@ -292,6 +293,10 @@ class TMApp(Frame):
     def SetEdit_MinimalDuration_Task(self):
         from lib import task_config
         task_config.SetEdit_MinimalDuration_Task()
+
+    def Configure(self):
+        from lib import configuration
+        configuration.Configuration()
 
     def SetDuration_MainDailyGroups(self):
         from lib import task_config
