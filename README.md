@@ -1,4 +1,5 @@
 # time management app (tm)
+
 tasks can be added and monitored.
 can add deadlines to tasks
 can add minimal duration per day for tasks
@@ -7,24 +8,28 @@ tm shows nr of days left until deadline
 tm shows nr of days a task has been performed more then the minimal daily duration.
 
 tm's goals:
-= train for consistency.
+= keep track of tasks and deadline
 = complete tasks before deadline
-= keep track of tasks
-= see how much is needed on average to perform a task
-= complete job tasks and personal tasks.
+= differentiate between job tasks and personal development tasks.
+= train for consistency.
+= see the required average time to complete a task
 
 
 Philosophy:
-= tasks that are being done daily oblige the brain and the body to adapt in order to perform that task at the best possible performance level by using the minimal possible energy/time resources.
-= tasks can include work/ job chores as well as personal development tasks (learn something, train behavioral patterns)
-= initially the brain and the body will search/ invent reasons why certain tasks should/must not be done. This would be passed after the 40 days level. After a task is performed daily during 40 days in a row, one can say that a certain task has switched to an automated level.
-= second level would be around 3-6 months.
-= third level is after 3 years, when the majority of cells in the body will be renewed and these new cells will be trained every day to perform a certain tasks. All the body and all the cells will consider a normal state to perform a certain task.
+= tasks that are being done daily impose brain and body adaptation in order for the human biological system to adjust and perform a task at the best possible performance level by using the minimal possible energy/time resources.
+= Procrastination is just a task learned by the body and the brain. It can be unlearned.
+= tasks can include job chores as well as personal development tasks (learn something, train behavioral patterns). This allows to understand which are the personal interest and with time allows to align the job tasks with personal interest tasks.
+= our brain searches and invent reasons why certain tasks should/must not be done (more details in Daniel Kahneman "Thinking fast and slow").
+= common brain plasticity levels are: 40 days consistent repetition (commencement of brain reorganization and initiation of automation processes); second level would be around 3-6 months (significant number cells that new and used the previous behavioural patterns have died, new cells are active that were born and during all their life they activated in an environement with new behavioral rules and patterns, e.g., reading at least one page every day).
+= third level is after 3 years, when the majority of cells in the body will be renewed and these new cells will be trained every day to perform certain tasks. The whole body will consider it a normal state to perform a certain task. Absence of a certain task - can induce neuropsychiatric symptoms - anxiety.
 
 Example of Personal development tasks:
-- learn to script
+- learning something (talking, writing, fast reading, scripting)
 - learn a language or several at the same time (use Anki)
-- sport/ fitness. Aim for weight training or high intensity, minimum 15 minutes per day, every day. Start with 1 minute per day, every day.
-- train emotional/ behavioral patterns (to stay calm in any situation, to always be aware about the tone/ voice that is being used; train the handshake, the smile, watching people in the eyes, gratitude, posture, awareness about something)
+- sport/ fitness. Aim for weight training or high intensity, minimum 15 minutes per day, every day. Start with 1 minute per day, every day. Nevertheless - must conider that all cells need an adaptation time and regularly breaks and good sleep are a must.
+- training emotional/ behavioral patterns (to stay calm in any situation, to always be aware about the tone/ voice that is being used; train the handshake, the smile, watching people in the eyes, gratitude, posture, awareness about something)
 - perform cognitive training/ enhancement of cognitive performance (for memory, attention, working memory, reaction time, visual field, color distinction, sound distinction, sound intensity, taste distinction, taste intensity, smell distinction, body feelings, skin sensations, external(skin)/internal(body) vibrations, heart beats, bowel movements, eye movements, whole bode movements, vibration in the feet (internal/ external), hair vibrations, muscle relaxation).
+
+references:
+https://jamesclear.com/habit-tracker
 
