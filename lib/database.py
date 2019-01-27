@@ -1,7 +1,5 @@
 from sqlite3 import connect, OperationalError
-from os import environ, path
-import pandas.io.sql as pdsql
-import pandas as pd
+from os import environ
 from time import strftime, localtime, gmtime
 import pathlib 
 
@@ -112,15 +110,10 @@ def get_tasks_for_table_(table_name):
     all_data_for_table = cursor.fetchall()        
     table = {}
     if table_name == 'MainDailyGroups':
-        for tab in conn.execute('''SELECT * FROM "Tabs" '''):
+        for tab in get_tasks_for_table_("Tabs"):
             table[tab] = []
     for Group in all_data_for_table:
-        if table_name == 'MainDailyGroups':
-            if Group[0] in table:
-                table[Group[0]].append(Group[1])
-            else:
-                print('ERROR! ',Group[0],' missing from list of tabs')
-        elif table_name in ['PausedTasks','ArchivedTasks','Projects']:
+        if table_name in ['MainDailyGroups','PausedTasks','ArchivedTasks','Projects']:
             if Group[0] not in table:
                 table[Group[0]] = []
             table[Group[0]].append(Group[1])
@@ -133,6 +126,7 @@ def get_tasks_for_table_(table_name):
 
 
 def update_db_from_pandas(dfsql):
+    import pandas.io.sql as pdsql
     conn = __connect_db__()
     pdsql.to_sql(dfsql, 'Database', conn, if_exists='append', index=False)
     print('dfsql added to database')
@@ -146,6 +140,7 @@ def get_values_for_task_(table, task, column):
 
 
 def retrieve_all_data(file_2save):
+    import pandas as pd
     conn = __connect_db__()
     df = pd.read_sql('''SELECT * from Database''',conn)
     df.to_csv(file_2save, encoding='utf-8', index=False)
