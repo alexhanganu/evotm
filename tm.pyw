@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #updated 2018-03-18
 
-from os import listdir, getcwd, path
+from os import listdir, getcwd, path, environ
 from sys import version_info, platform
 from datetime import date, datetime
 import time
@@ -17,11 +17,16 @@ from lib import update
 MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
 MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
+Tabs = database.get_tasks_for_table_('Tabs')
 
-ls_MainDailyGroups_tmp = []
-for key in MainDailyGroups:
-    ls_MainDailyGroups_tmp.append(key)
-ls_MainDailyGroups = sorted(ls_MainDailyGroups_tmp)
+ls_MainDailyGroups = []
+ls_sorting_order_from_tabs = []
+for tab in Tabs:
+    ls_sorting_order_from_tabs.append(Tabs[tab])
+for order in sorted(ls_sorting_order_from_tabs):
+    for tab in Tabs:
+        if Tabs[tab] == order:
+            ls_MainDailyGroups.append(tab)
 
 
 class TMApp(Frame):
@@ -47,9 +52,9 @@ class TMApp(Frame):
         self._TimeLeftDailyMainGroup = StringVar()
         self._TaskTotalDailyDuration = StringVar()
         self._TotalProjectDuration = ['']
-        for key in MainDailyGroups:
-            self.Project_Duration_Now = {key:StringVar(),}
-
+        self.Project_Duration_Now = {}
+        for tab in Tabs:
+            self.Project_Duration_Now[tab] = StringVar()
         self._taskrunning = ['']
         self._Projectrunning = ['']
         self._taskclosed = ['']
@@ -128,7 +133,10 @@ class TMApp(Frame):
                     task_in_date_deadline = True
                     self.button_days_task_active_dict[task] = Button(self, height=1, width=2, text=(((date(int(Date_deadline[task][:4]), int(Date_deadline[task][4:6]), int(Date_deadline[task][6:])))-date.today()).days))
                     self.button_days_task_active_dict[task].grid(row=rownr, column=col+1)
-                    self.button_days_task_active_dict[task].configure(bg = 'firebrick')                
+                    if days_left < 10:
+                        self.button_days_task_active_dict[task].configure(bg = 'firebrick')         
+                    else:
+                        self.button_days_task_active_dict[task].configure(bg = 'orange')
                 rownr += 1
                 if project == ls_MainDailyGroups[0]:
                     if task_in_minimum_daily or task_in_date_deadline:
@@ -149,24 +157,28 @@ class TMApp(Frame):
 
 
     def WidgetTaskDuration(self):
-        if len(ls_MainDailyGroups)>2:
-                widget_task_text_row_nr = self.row_nr
-                widget_task_variable_row_nr = self.row_nr
-                widget_task_variable_col_nr = self.nr_of_col_4_widget
-                row_button = self.row_nr            
-                col_button = self.col_nr_4_stop_button
-        elif len(ls_MainDailyGroups)==1:
-                widget_task_text_row_nr = self.row_nr
-                widget_task_variable_row_nr = self.row_nr+1
-                widget_task_variable_col_nr = 0
-                row_button = self.row_nr+1
-                col_button = self.col_nr_4_stop_button-1
-        else:
-                widget_task_text_row_nr = self.row_nr
-                widget_task_variable_row_nr = self.row_nr+1
-                widget_task_variable_col_nr = 0
-                row_button = self.row_nr+1
-                col_button = self.col_nr_4_stop_button-1
+        # if len(ls_MainDailyGroups)>2:
+                # widget_task_text_row_nr = self.row_nr
+                # widget_task_variable_row_nr = self.row_nr
+                # widget_task_variable_col_nr = self.nr_of_col_4_widget
+                # row_button = self.row_nr            
+                # col_button = self.col_nr_4_stop_button
+        # elif len(ls_MainDailyGroups)==1:
+                # widget_task_text_row_nr = self.row_nr
+                # widget_task_variable_row_nr = self.row_nr+1
+                # widget_task_variable_col_nr = 0
+                # row_button = self.row_nr+1
+                # col_button = self.col_nr_4_stop_button-1
+        # else:
+                # widget_task_text_row_nr = self.row_nr
+                # widget_task_variable_row_nr = self.row_nr+1
+                # widget_task_variable_col_nr = 0
+                # row_button = self.row_nr+1
+                # col_button = self.col_nr_4_stop_button-1
+
+        row_button, col_button = (self.row_nr+1, self.col_nr_4_stop_button-1)
+        if len(MainDailyGroups)>0 and len(MainDailyGroups[ls_MainDailyGroups[0]])>0:
+                row_button, col_button = (self.row_nr, self.col_nr_4_stop_button)
 
         Label(self, textvariable=self._TaskTotalDailyDuration).grid(row=widget_task_text_row_nr, column=0)
 
@@ -309,11 +321,7 @@ class TMApp(Frame):
     def Show_Stats(self):
         from lib import make_stats
         make_stats.Show_Stats()
-        database.retrieve_all_data('C:/Users/Alex/Desktop/db_Database.csv')
-
-    def popupmsg(self, msg):
-        from lib import menu
-        menu.popupmsg(msg)
+        database.retrieve_all_data(path.join(environ["HOMEPATH"], "Desktop",'db_Database.csv'))
 
 def on_closing():
         print('closing app and database')
