@@ -10,18 +10,13 @@ class Configuration():
 
         Button(self.main, text='New tab', command=self.NewTab).grid(row=0, column=0)
 
-        # Label(self.main, text='Tabs').grid(row=0, column=0)
         self.maindaily_listbox = Listbox(self.main, exportselection=0)
         self.maindaily_listbox.grid(row=1, column=0)
         self.ls = []
         self.d_tabs = database.get_tasks_for_table_('Tabs')
         for tab in self.d_tabs:
-            print(tab, self.d_tabs[tab])
-            if tab not in self.ls:
-                self.ls.append(tab)
-        for item in self.ls:
-            self.maindaily_listbox.insert(END, item)
-        self.maindaily_listbox.config(width=20, height=len(self.ls)+1)
+                self.maindaily_listbox.insert(END, tab)
+        self.maindaily_listbox.config(width=20, height=len(self.d_tabs)+1)
         
         self.EntryTask = Entry(self.main)
         self.EntryTask.grid(row=2, column=0)
@@ -49,13 +44,14 @@ class Configuration():
         tab = simpledialog.askstring("askstring", "Enter New Tab")
         position_id = 0
         for tab in self.d_tabs:
-            if str(self.d_tabs[tab]) > position_id:
-                position_id = str(self.d_tabs[tab])
+            if int(self.d_tabs[tab]) > position_id:
+                position_id = int(self.d_tabs[tab])
         database.__insert_in_table__('Tabs',tab, str(position_id+1))
-        self.ls.append(tab)
         self.maindaily_listbox.insert(END, tab)
-        self.maindaily_listbox.config(width=self.width, height=len(self.ls))
+        self.maindaily_listbox.config(width=20, height=len(self.d_tabs)+1)
 
+'''checkbutton is an alternative
+'''
         # Label(self.main, text="Pick active tab:").grid(row=0, sticky=W)
         # self.var1 = IntVar()
         # Checkbutton(self.main, text="Job", variable=self.var1).grid(row=1, sticky=W)
