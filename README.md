@@ -25,8 +25,7 @@ Philosophy:
 
 Example of Personal development tasks:
 - learning something (talking, writing, fast reading, scripting)
-- learn a language or several at the same time (use Anki)
-- sport/ fitness. Aim for weight training or high intensity, minimum 15 minutes per day, every day. Start with 1 minute per day, every day. Nevertheless - must conider that all cells need an adaptation time and regularly breaks and good sleep are a must.
+- sport/ fitness
 - training emotional/ behavioral patterns (to stay calm in any situation, to always be aware about the tone/ voice that is being used; train the handshake, the smile, watching people in the eyes, gratitude, posture, awareness about something)
 - perform cognitive training/ enhancement of cognitive performance (for memory, attention, working memory, reaction time, visual field, color distinction, sound distinction, sound intensity, taste distinction, taste intensity, smell distinction, body feelings, skin sensations, external(skin)/internal(body) vibrations, heart beats, bowel movements, eye movements, whole bode movements, vibration in the feet (internal/ external), hair vibrations, muscle relaxation).
 
