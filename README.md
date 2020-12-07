@@ -1,4 +1,4 @@
-# time management app (tm)
+# time management app (tm) (habit tracker / habit changer / brain-body reprogramming)
 
 tasks can be added and monitored.
 can add deadlines to tasks
