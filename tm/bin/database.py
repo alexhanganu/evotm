@@ -1,10 +1,12 @@
 from sqlite3 import connect, OperationalError
-from os import environ
+from os import environ, path
 from time import strftime, localtime, gmtime
 import pathlib 
+from setup.get_credentials_home import _get_credentials_home
 
 def __connect_db__():
-    conn = connect(str(pathlib.Path().absolute())+'/lib/'+environ['COMPUTERNAME']+'.db', check_same_thread=False)
+    db = path.join(_get_credentials_home(), environ['COMPUTERNAME']+'.db')
+    conn = connect(db, check_same_thread=False)
     try:
         __get_table_(conn)
     except OperationalError:
@@ -67,7 +69,7 @@ def SetDailyTaskDuration(task, duration):
         conn.executemany('''INSERT INTO Dailydatabase VALUES(?,?,?,?)''', data)
     conn.commit()
 
-	
+
 def ComputeTaskDuration(task):
     conn = __connect_db__()
     date = str(strftime('%Y%m%d', localtime()))
@@ -91,7 +93,7 @@ def ComputeProjectDuration(project):
                 duration_in_db = conn.execute('''SELECT duration_id FROM Dailydatabase WHERE task_id="{0}" '''.format(task,)).fetchone()[0]
                 _TotalProjectDuration_in_db = float(duration_in_db)+ _TotalProjectDuration_in_db
     return _TotalProjectDuration_in_db
-	
+
 
 def task_in_table(table, task):
     conn = __connect_db__()

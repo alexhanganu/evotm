@@ -11,8 +11,8 @@ if version_info[0] >=3:
 else:
     from Tkinter import Tk, ttk, Frame, Label, Button, Menu, StringVar
 
-from lib import database
-from lib import update
+from bin import database
+from bin import update
 
 MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
@@ -291,35 +291,35 @@ class TMApp(Frame):
         self.button_dict[self._taskclosed].configure(bg = "green")
 
     def NewTask(self):
-        from lib import task_config
+        from bin import task_config
         task_config.NewTask()
 
     def EditTask(self):
-        from lib import task_config
+        from bin import task_config
         task_config.EditTask()
 
     def ActivateTask(self):
-        from lib import task_config
+        from bin import task_config
         task_config.ActivateTask()
 
     def SetEdit_MinimalDuration_Task(self):
-        from lib import task_config
+        from bin import task_config
         task_config.SetEdit_MinimalDuration_Task()
 
     def Configure(self):
-        from lib import configuration
+        from bin import configuration
         configuration.Configuration()
 
     def SetDuration_MainDailyGroups(self):
-        from lib import task_config
+        from bin import task_config
         task_config.SetDuration_MainDailyGroups()
 
     def Edit_Task_Duration(self):
-        from lib import task_config
+        from bin import task_config
         task_config.Edit_Task_Duration()
 
     def Show_Stats(self):
-        from lib import make_stats
+        from bin import make_stats
         make_stats.Show_Stats()
         database.retrieve_all_data(path.join(environ["HOMEPATH"], "Desktop",'db_Database.csv'))
 
