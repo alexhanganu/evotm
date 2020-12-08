@@ -33,3 +33,11 @@ Philosophy:
 references:
 https://jamesclear.com/habit-tracker
 
+For the link with Google Calendar check:
+https://developers.google.com/calendar/quickstart/python
+
+1) Turn on the Google Calendar API
+2) Download Client Configuration and save to file "credentials.json"
+3) mv credentials.json to ~/calendar_credentials.json
+4) Connect to your google account, change in account -> security -> Access to application less secure -> activate
+5) Restart connection -> authorize quickstart to access the calendar -> a message is received: "Authencitication is complete"
