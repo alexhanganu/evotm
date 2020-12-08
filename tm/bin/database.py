@@ -5,7 +5,7 @@ import pathlib
 from setup.get_credentials_home import _get_credentials_home
 
 def __connect_db__():
-    db = path.join(_get_credentials_home(), environ['COMPUTERNAME']+'.db')
+    db = path.join(_get_credentials_home(), 'tm.db')
     conn = connect(db, check_same_thread=False)
     try:
         __get_table_(conn)

@@ -157,24 +157,24 @@ class TMApp(Frame):
 
 
     def WidgetTaskDuration(self):
-        # if len(ls_MainDailyGroups)>2:
-                # widget_task_text_row_nr = self.row_nr
-                # widget_task_variable_row_nr = self.row_nr
-                # widget_task_variable_col_nr = self.nr_of_col_4_widget
-                # row_button = self.row_nr            
-                # col_button = self.col_nr_4_stop_button
-        # elif len(ls_MainDailyGroups)==1:
-                # widget_task_text_row_nr = self.row_nr
-                # widget_task_variable_row_nr = self.row_nr+1
-                # widget_task_variable_col_nr = 0
-                # row_button = self.row_nr+1
-                # col_button = self.col_nr_4_stop_button-1
-        # else:
-                # widget_task_text_row_nr = self.row_nr
-                # widget_task_variable_row_nr = self.row_nr+1
-                # widget_task_variable_col_nr = 0
-                # row_button = self.row_nr+1
-                # col_button = self.col_nr_4_stop_button-1
+        if len(ls_MainDailyGroups)>2:
+                widget_task_text_row_nr = self.row_nr
+                widget_task_variable_row_nr = self.row_nr
+                widget_task_variable_col_nr = self.nr_of_col_4_widget
+                row_button = self.row_nr            
+                col_button = self.col_nr_4_stop_button
+        elif len(ls_MainDailyGroups)==1:
+                widget_task_text_row_nr = self.row_nr
+                widget_task_variable_row_nr = self.row_nr+1
+                widget_task_variable_col_nr = 0
+                row_button = self.row_nr+1
+                col_button = self.col_nr_4_stop_button-1
+        else:
+                widget_task_text_row_nr = self.row_nr
+                widget_task_variable_row_nr = self.row_nr+1
+                widget_task_variable_col_nr = 0
+                row_button = self.row_nr+1
+                col_button = self.col_nr_4_stop_button-1
 
         row_button, col_button = (self.row_nr+1, self.col_nr_4_stop_button-1)
         if len(MainDailyGroups)>0 and len(MainDailyGroups[ls_MainDailyGroups[0]])>0:
