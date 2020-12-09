@@ -1,0 +1,9 @@
+__pycache__/
+build/
+eggs/
+.eggs/
+wheels/
+.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
