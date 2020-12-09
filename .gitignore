@@ -4,6 +4,8 @@ eggs/
 .eggs/
 wheels/
 .egg
+dist/
+.egg-info/
 
 # Jupyter Notebook
 .ipynb_checkpoints
