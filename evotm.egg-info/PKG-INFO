@@ -1,8 +1,8 @@
 Metadata-Version: 2.1
-Name: tm
+Name: evotm
 Version: 0.0.1
 Summary: Time and Task management app with Google Calendar link
-Home-page: https://github.com/alexhanganu/tm
+Home-page: https://github.com/alexhanganu/evotm
 Author: Alexandru Hanganu
 Author-email: alexandru.hanganu@umontreal.ca
 License: UNKNOWN
