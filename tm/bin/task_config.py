@@ -117,15 +117,16 @@ class NewTask():
             ls_selected_projects.append(entrada)
 
         for maindailygroup in ls_selected_maindaily:
-            database.__insert_in_table__('MainDailyGroups',maindailygroup, Task2Add)
+            database.__insert_in_table__('MainDailyGroups', maindailygroup, Task2Add)
+            database.__insert_in_table__('Days_task_active', Task2Add, 0)
         if len(ls_selected_projects)>0:
             for project in ls_selected_projects:
-                database.__insert_in_table__('Projects',project, Task2Add)
+                database.__insert_in_table__('Projects', project, Task2Add)
 
         deadline = self.date_deadline
         if deadline != 'no date':
             print('adding deadline to db: ', deadline)
-            database.__insert_in_table__('Date_deadline',Task2Add, deadline)
+            database.__insert_in_table__('Date_deadline', Task2Add, deadline)
         self.main.destroy()
 
     def NewProject(self):

@@ -72,7 +72,7 @@ def SetDailyTaskDuration(task, duration):
 
 def ComputeTaskDuration(task):
     conn = __connect_db__()
-    date = str(strftime('%Y%m%d', localtime()))
+    # date = str(strftime('%Y%m%d', localtime()))
     _TotalTaskDuration = 0
     if task_in_table('Dailydatabase', task):
         duration_in_db = conn.execute('''SELECT duration_id FROM Dailydatabase WHERE task_id="{0}" '''.format(task,)).fetchone()[0]

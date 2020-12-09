@@ -1,7 +1,7 @@
 # https://developers.google.com/calendar/quickstart/python
 
 from __future__ import print_function
-import datetime
+from datetime import datetime, timedelta
 import pickle
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -9,19 +9,20 @@ from google.auth.transport.requests import Request
 from os import path, environ
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 class CalendarGoogle:
-    def __init__(self, tm_home):
-        self.home = tm_home
+    def __init__(self, tm_home, time_zone):
+        self.home      = tm_home
+        self.time_zone = time_zone
         self.conn = self.calendar_connection()
 
     def calendar_connection(self):
         """Shows basic usage of the Google Calendar API.
         Prints the start and name of the next 10 events on the user's calendar.
         """
-        CREDENTIALS_FILE = path.join(self.home,'credentials.json')
-        TOKEN_FILE = path.join(self.home,'token.pickle')
+        CREDENTIALS_FILE = path.join(self.home,"credentials.json")
+        TOKEN_FILE = path.join(self.home,"token.pickle")
         creds = None
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -38,7 +39,7 @@ class CalendarGoogle:
                     CREDENTIALS_FILE, SCOPES)
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open('token.pickle', 'wb') as token:
+            with open(TOKEN_FILE, 'wb') as token:
                 pickle.dump(creds, token)
         service = build('calendar', 'v3', credentials=creds)
         return service
@@ -46,7 +47,7 @@ class CalendarGoogle:
 
     def list_events(self):
         # Call the Calendar API
-        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        now = datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
         print('Getting List of 10 events')
         events_result = self.conn.events().list(calendarId='primary', timeMin=now,
                                             maxResults=10, singleEvents=True,
@@ -76,21 +77,15 @@ class CalendarGoogle:
             print("%s\t%s\t%s" % (summary, id, primary))
 
 
-    def create_event(self):
-        # creates one hour event tomorrow 10 AM IST
-        service = get_calendar_service()
-
-        d = datetime.now().date()
-        tomorrow = datetime(d.year, d.month, d.day, 10)+timedelta(days=1)
-        start = tomorrow.isoformat()
-        end = (tomorrow + timedelta(hours=1)).isoformat()
-
-        event_result = service.events().insert(calendarId='primary',
+    def create_event(self, task, start_time, end_time):
+        # add task to google calendar
+        print(start_time, end_time)
+        event_result = self.conn.events().insert(calendarId='primary',
             body={ 
-                "summary": 'Automating calendar', 
-                "description": 'This is a tutorial example of automating google calendar with python',
-                "start": {"dateTime": start, "timeZone": 'Asia/Kolkata'}, 
-                "end": {"dateTime": end, "timeZone": 'Asia/Kolkata'},
+                "summary": task, 
+                "description": '',
+                "start": {"dateTime": start_time, "timeZone": self.time_zone}, 
+                "end": {"dateTime": end_time, "timeZone": self.time_zone},
             }
         ).execute()
 
@@ -102,21 +97,20 @@ class CalendarGoogle:
 
     def update_event():
         # update the event to tomorrow 9 AM IST
-        service = get_calendar_service()
 
         d = datetime.now().date()
         tomorrow = datetime(d.year, d.month, d.day, 9)+timedelta(days=1)
         start = tomorrow.isoformat()
         end = (tomorrow + timedelta(hours=2)).isoformat()
 
-        event_result = service.events().update(
+        event_result = self.conn.events().update(
             calendarId='primary',
             eventId='4qnt0okd4dmr0hik3mh073qnls',
             body={ 
                 "summary": 'Updated Automating calendar',
                 "description": 'This is a tutorial example of automating google calendar with python, updated time.',
-                "start": {"dateTime": start, "timeZone": 'Asia/Kolkata'}, 
-                "end": {"dateTime": end, "timeZone": 'Asia/Kolkata'},
+                "start": {"dateTime": start, "timeZone": self.time_zone}, 
+                "end": {"dateTime": end, "timeZone": self.time_zone},
             },
         ).execute()
 
@@ -128,9 +122,8 @@ class CalendarGoogle:
 
     def delete_event(self):
         # Delete the event
-        service = get_calendar_service()
         try:
-            service.events().delete(
+            self.conn.events().delete(
                 calendarId='primary',
                 eventId='4qnt0okd4dmr0hik3mh073qnls',
             ).execute()

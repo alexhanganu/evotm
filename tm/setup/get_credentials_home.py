@@ -6,11 +6,14 @@ def _get_credentials_home():
         home = environ['USERPROFILE']
     else:
         home = environ['HOME']
-    credentials_path = path.join(path.dirname(__file__), "credentials_path")
-    credentials_home = open(credentials_path).readlines()[0].replace("~",home).replace(sep, '/')
-    print('credentials are located at:{}'.format(credentials_home))
-    if not path.exists(credentials_home):
-        makedirs(credentials_home)
+    try:
+        from setup.credentials_path import credentials_home
+        credentials_home = credentials_home.replace("~", home).replace(sep, '/')
+        if not path.exists(credentials_home):
+            makedirs(credentials_home)
+    except Exception as e:
+        print(e, 'credentials are missing')
+        credentials_home = ''
     return credentials_home
 
 

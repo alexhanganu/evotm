@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 #updated 2018-03-18
+time_zone = 'US/Eastern'
 
 from os import listdir, getcwd, path, environ
 from sys import version_info, platform
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import time
+environ['TZ'] = 'US/Eastern'
+time.tzset()
 
 if version_info[0] >=3:
     from tkinter import Tk, ttk, Frame, Label, Button, Menu, StringVar
@@ -14,7 +17,7 @@ else:
 from bin import database
 from bin import update
 from setup.get_credentials_home import _get_credentials_home
-# from calendar_google.calendar_google import CalendarGoogle
+from calendar_google.calendar_google import CalendarGoogle
 MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
 MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
@@ -29,8 +32,8 @@ for order in sorted(ls_sorting_order_from_tabs):
         if Tabs[tab] == order:
             ls_MainDailyGroups.append(tab)
 
-# cal = CalendarGoogle(_get_credentials_home())
-# cal.list_events()
+cred_home = _get_credentials_home()
+cal = CalendarGoogle(cred_home, time_zone)
 
 class TMApp(Frame):
     def __init__(self, parent, *args, **kwargs):  
@@ -48,10 +51,11 @@ class TMApp(Frame):
         filemenu.add_command(label="Statistics", command=lambda: self.Show_Stats())
         self.master.config(menu=menubar)
 
-        self._start = 0.0        
-        self._elapsedtime = 0.0
-        self._running = 0
+        self._start             = 0.0         
+        self._elapsedtime       = 0.0
+        self._running           = 0
         self._TotalTaskDuration = 0
+        self._cal_starttime     = 0
         self._TimeLeftDailyMainGroup = StringVar()
         self._TaskTotalDailyDuration = StringVar()
         self._TotalProjectDuration = ['']
@@ -62,6 +66,7 @@ class TMApp(Frame):
         self._Projectrunning = ['']
         self._taskclosed = ['']
 
+        self.mincal = 900 # 15 minutes minimal time to add to google calendar
 
         self.check_today()
 
@@ -81,7 +86,8 @@ class TMApp(Frame):
         self.SetProjectDuration()
 
     def check_today(self):
-        today = datetime.strptime(datetime.today().strftime("%Y%m%d"), "%Y%m%d").strftime("%Y%m%d")
+        today = datetime.today().strftime("%Y%m%d")
+#        today = datetime.strptime(datetime.today().strftime("%Y%m%d"), "%Y%m%d").strftime("%Y%m%d")
         d_tasks = database.get_tasks_for_table_('Dailydatabase')
         ls_tasks = []
         if len(d_tasks)>0:
@@ -134,7 +140,8 @@ class TMApp(Frame):
                     self.button_days_task_active_dict[task].grid(row=rownr, column=col+1)
                 if task in Date_deadline:
                     task_in_date_deadline = True
-                    self.button_days_task_active_dict[task] = Button(self, height=1, width=2, text=(((date(int(Date_deadline[task][:4]), int(Date_deadline[task][4:6]), int(Date_deadline[task][6:])))-date.today()).days))
+                    days_left = (((date(int(Date_deadline[task][:4]), int(Date_deadline[task][4:6]), int(Date_deadline[task][6:])))-date.today()).days)
+                    self.button_days_task_active_dict[task] = Button(self, height=1, width=2, text=days_left)
                     self.button_days_task_active_dict[task].grid(row=rownr, column=col+1)
                     if days_left < 10:
                         self.button_days_task_active_dict[task].configure(bg = 'firebrick')         
@@ -243,6 +250,7 @@ class TMApp(Frame):
             self._setTime(self._elapsedtime)
             self._running = 0
             database.UpdateDailyTask(self._taskrunning, self._elapsedtime)
+            self.CalendarGoogleUpdate()
 
 
     def Reset(self):                                  
@@ -269,6 +277,13 @@ class TMApp(Frame):
         self.button_dict[task].configure(bg = "green")
         self._taskclosed = self._taskrunning
 
+    def CalendarGoogleUpdate(self):
+        project = database.get_values_for_task_('Projects',self._taskrunning,'project_id')[0][0]
+        if self._elapsedtime > self.mincal:
+            cal_entrance = '{}| {}'.format(project, self._taskrunning)
+            now = datetime.now()
+            start_time = (now - timedelta(seconds = self._elapsedtime)).isoformat()
+            cal.create_event(cal_entrance, start_time, now.isoformat())
 
     def ProjectDuration(self, project):
         self._TotalProjectDuration = database.ComputeProjectDuration(project)
