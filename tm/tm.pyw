@@ -13,7 +13,8 @@ else:
 
 from bin import database
 from bin import update
-
+from setup.get_credentials_home import _get_credentials_home
+# from calendar_google.calendar_google import CalendarGoogle
 MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
 Days_task_active = database.get_tasks_for_table_('Days_task_active')
 MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
@@ -28,6 +29,8 @@ for order in sorted(ls_sorting_order_from_tabs):
         if Tabs[tab] == order:
             ls_MainDailyGroups.append(tab)
 
+# cal = CalendarGoogle(_get_credentials_home())
+# cal.list_events()
 
 class TMApp(Frame):
     def __init__(self, parent, *args, **kwargs):  

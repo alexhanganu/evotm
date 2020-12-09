@@ -10,18 +10,18 @@ from os import path, environ
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-CREDENTIALS_FILE = path.join(environ['HOME'],'calendar_credentials.json')
-TOKEN_FILE = path.join(environ['HOME'],'token.pickle')
 
 class CalendarGoogle:
-    def __init__(self, task = 'task1'):
-        self.task = task
+    def __init__(self, tm_home):
+        self.home = tm_home
         self.conn = self.calendar_connection()
 
     def calendar_connection(self):
         """Shows basic usage of the Google Calendar API.
         Prints the start and name of the next 10 events on the user's calendar.
         """
+        CREDENTIALS_FILE = path.join(self.home,'credentials.json')
+        TOKEN_FILE = path.join(self.home,'token.pickle')
         creds = None
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first

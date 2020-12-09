@@ -8,7 +8,7 @@ def _get_credentials_home():
         home = environ['HOME']
     credentials_path = path.join(path.dirname(__file__), "credentials_path")
     credentials_home = open(credentials_path).readlines()[0].replace("~",home).replace(sep, '/')
-#    print(credentials_home)
+    print('credentials are located at:{}'.format(credentials_home))
     if not path.exists(credentials_home):
         makedirs(credentials_home)
     return credentials_home
