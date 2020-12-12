@@ -1,17 +1,11 @@
+'''script for configuring tasks
+'''
+
 from tkinter import Tk, ttk, Label, Button, Entry, Listbox, EXTENDED, END, simpledialog, StringVar, Menu
 from os import listdir, rename, path
 import time, re
 
-from . import database
-
 from . import tkSimpleDialog
-MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
-Projects = database.get_tasks_for_table_('Projects')
-Days_task_active = database.get_tasks_for_table_('Days_task_active')
-MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
-Date_deadline = database.get_tasks_for_table_('Date_deadline')
-PausedTasks = database.get_tasks_for_table_('PausedTasks')
-MainDailyGroups_bg_color = database.get_tasks_for_table_('MainDailyGroups_bg_color')
 
 
 class CalendarDialog(tkSimpleDialog.Dialog):
@@ -57,41 +51,34 @@ class HoverInfo(Menu):
        self.unbind_all("<Return>")
 
 
-
 class NewTask():
-    def __init__(self):
+    def __init__(self, db):
         self.main = Tk()
         self.main.title("Add Task")
+        self.db = db
+        MainDailyGroups = db.get_tasks_for_table_('MainDailyGroups')
+        Projects = db.get_tasks_for_table_('Projects')
 
         ttk.Label(self.main, text='Main Daily Groups').grid(row=0, column=0)
         self.maindaily_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
         self.maindaily_listbox.grid(row=1, column=0)
-        self.width = 5
-        self.ls = []
-        for project in MainDailyGroups:
-            if project not in self.ls:
-                self.ls.append(project)
-        for item in self.ls:
+        width = 5
+        for item in MainDailyGroups:
             self.maindaily_listbox.insert(END, item)
-            if len(item)>self.width:
-                self.width = len(item)
-        self.maindaily_listbox.config(width=self.width, height=len(self.ls))
+            if len(item)>width:
+                width = len(item)
+        self.maindaily_listbox.config(width=width, height=len(MainDailyGroups))
         
         ttk.Label(self.main, text='Projects').grid(row=0, column=1)
         self.project_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
         self.project_listbox.grid(row=1, column=1)
-        self.project_width = 5
-        self.project_ls = []
+        project_width = width
         if len(Projects)>0:
-            for project in Projects:
-                if project not in self.project_ls:
-                    self.project_ls.append(project)
-
-            for item in self.project_ls:
+            for item in Projects:
                 self.project_listbox.insert(END, item)
-                if len(item)>self.project_width:
-                    self.project_width = len(item)
-        self.project_listbox.config(width=self.project_width, height=len(self.ls))
+                if len(item) > project_width:
+                    project_width = len(item)
+        self.project_listbox.config(width=project_width, height=len(Projects))
 
         self.EntryTask = Entry(self.main)
         self.EntryTask.grid(row=2, column=0)
@@ -117,21 +104,21 @@ class NewTask():
             ls_selected_projects.append(entrada)
 
         for maindailygroup in ls_selected_maindaily:
-            database.__insert_in_table__('MainDailyGroups', maindailygroup, Task2Add)
-            database.__insert_in_table__('Days_task_active', Task2Add, 0)
+            self.db.__insert_in_table__('MainDailyGroups', maindailygroup, Task2Add)
+            self.db.__insert_in_table__('Days_task_active', Task2Add, 0)
         if len(ls_selected_projects)>0:
             for project in ls_selected_projects:
-                database.__insert_in_table__('Projects', project, Task2Add)
+                self.db.__insert_in_table__('Projects', project, Task2Add)
 
         deadline = self.date_deadline
         if deadline != 'no date':
             print('adding deadline to db: ', deadline)
-            database.__insert_in_table__('Date_deadline', Task2Add, deadline)
+            self.db.__insert_in_table__('Date_deadline', Task2Add, deadline)
         self.main.destroy()
 
     def NewProject(self):
         project = simpledialog.askstring("askstring", "Enter New Project")
-        database.__insert_in_table__('Projects',project, '')
+        self.db.__insert_in_table__('Projects',project, '')
         self.ls.append(project)
         self.project_listbox.insert(END, project)
         self.project_listbox.config(width=self.width, height=len(self.ls))
@@ -146,21 +133,26 @@ class NewTask():
 
 
 class EditTask():
-    def __init__(self):
+    def __init__(self, db):
 
         self.main = Tk()
         self.main.title("Edit Task")
-        
+        self.db = db
+        self.Projects = db.get_tasks_for_table_('Projects')
+        self.MainDailyGroups = db.get_tasks_for_table_('MainDailyGroups')
+        self.MinDailyTaskDuration = db.get_tasks_for_table_('MinDailyTaskDuration')
+        # MainDailyGroups_bg_color = db.get_tasks_for_table_('MainDailyGroups_bg_color')
+
         ttk.Label(self.main, text='Active Tasks').grid(row=0, column=0)    
         self.listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
         self.listbox.grid(row=1, column=0)
         self.width = 10
         nr_symbol_count = 0
-        for key in MainDailyGroups:
+        for key in self.MainDailyGroups:
             self.listbox.insert(END, '=='+key+'==')
-            for item in MainDailyGroups[key]:
+            for item in self.MainDailyGroups[key]:
                 self.listbox.insert(END, item)
-                self.listbox.itemconfig(nr_symbol_count,{'bg':MainDailyGroups_bg_color[key]})
+                # self.listbox.itemconfig(nr_symbol_count,{'bg':MainDailyGroups_bg_color[key]})
                 if len(item)>self.width:
                     self.width = len(item)
                 nr_symbol_count += 1
@@ -171,8 +163,8 @@ class EditTask():
         self.project_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
         self.project_listbox.grid(row=1, column=1)
         self.project_width = 10
-        if len(Projects)>0:
-            for project in Projects:
+        if len(self.Projects)>0:
+            for project in self.Projects:
                     self.project_listbox.insert(END, project)
                     if len(project)>self.project_width:
                         self.project_width = len(project)
@@ -206,29 +198,30 @@ class EditTask():
         if deadline != 'no date':
             for Task2Update in ls_Tasks2Update:
                 print('adding deadline to db: ', deadline)
-                if database.task_in_table('Date_deadline',Task2Update):
-                    database.__update_table__('Date_deadline','date_id',deadline,'task_id',Task2Update)
+                if self.db.task_in_table('Date_deadline',Task2Update):
+                    self.db.__update_table__('Date_deadline','date_id',deadline,'task_id',Task2Update)
                 else:
-                    database.__insert_in_table__('Date_deadline',Task2Update, deadline)
+                    self.db.__insert_in_table__('Date_deadline',Task2Update, deadline)
 
         RenameTask = str(self.EntryNewTaskName.get())
         if len(RenameTask)>0 and RenameTask != 'set new name':
             import pandas as pd
             for Task2Update in ls_Tasks2Update:
-                for key in MainDailyGroups:
+                for key in self.MainDailyGroups:
                     if Task2Update == ''=='+key+'=='':
                         pass
                     else:
-                        for value in MainDailyGroups[key]:
+                        for value in self.MainDailyGroups[key]:
                             if value == Task2Update:
-                                database.__update_table__('MainDailyGroups','task_id',RenameTask, 'task_id',Task2Update)
-                for key in Projects:
-                            for value in Projects[key]:
+                                self.db.__update_table__('MainDailyGroups','task_id',RenameTask, 'task_id',Task2Update)
+                for key in self.Projects:
+                            for value in self.Projects[key]:
                                 if value == Task2Update:
-                                    database.__update_table__('Projects','task_id',RenameTask, 'task_id',Task2Update)
-                if Task2Update in MinDailyTaskDuration:
-                            database.__update_table__('MinDailyTaskDuration', 'task_id',RenameTask,'task_id', Task2Update)
-                            database.__update_table__('Days_task_active','task_id',RenameTask, 'task_id',Task2Update)
+                                    self.db.__update_table__('Projects','task_id',RenameTask, 'task_id',Task2Update)
+                self.MinDailyTaskDuration = self.db.get_tasks_for_table_('MinDailyTaskDuration')
+                if Task2Update in self.MinDailyTaskDuration:
+                            self.db.__update_table__('MinDailyTaskDuration', 'task_id',RenameTask,'task_id', Task2Update)
+                            self.db.__update_table__('Days_task_active','task_id',RenameTask, 'task_id',Task2Update)
         self.main.destroy()
 
     def Pause(self):
@@ -238,34 +231,35 @@ class EditTask():
             value = self.listbox.get(i)
             ls_Tasks2Update.append(value)
         for Task2Pause in ls_Tasks2Update:
-            for key in MainDailyGroups:
-                for value in MainDailyGroups[key]:
+            for key in self.MainDailyGroups:
+                for value in self.MainDailyGroups[key]:
                     if value == Task2Pause:
                         project = key
-            database.__delete_from_table__('MainDailyGroups',project, Task2Pause)
-            database.__insert_in_table__('PausedTasks',project, Task2Pause)
-            if Task2Pause in MinDailyTaskDuration:
-                database.__delete_from_table__('MinDailyTaskDuration',project, Task2Pause)
+            self.db.__delete_from_table__('MainDailyGroups',project, Task2Pause)
+            self.db.__insert_in_table__('PausedTasks',project, Task2Pause)
+            if Task2Pause in self.MinDailyTaskDuration:
+                self.db.__delete_from_table__('MinDailyTaskDuration',project, Task2Pause)
         self.main.destroy()
 
     def Archive(self):
-        ArchivedTasks = database.get_tasks_for_table_('ArchivedTasks')
+        Date_deadline = self.db.get_tasks_for_table_('Date_deadline')
+        ArchivedTasks = self.db.get_tasks_for_table_('ArchivedTasks')
         ls_Tasks2Update = list()
         selection = self.listbox.curselection()
         for i in selection:
             value = self.listbox.get(i)
             ls_Tasks2Update.append(value)
         for Task2Archive in ls_Tasks2Update:
-            for key in MainDailyGroups:
-                for value in MainDailyGroups[key]:
+            for key in self.MainDailyGroups:
+                for value in self.MainDailyGroups[key]:
                     if value == Task2Archive:
                         project = key
-            database.__delete_from_table__('MainDailyGroups',project, Task2Archive)
-            database.__insert_in_table__('ArchivedTasks',project, Task2Archive)
+            self.db.__delete_from_table__('MainDailyGroups',project, Task2Archive)
+            self.db.__insert_in_table__('ArchivedTasks',project, Task2Archive)
             if Task2Archive in Date_deadline:
-                database.__delete_from_table__('Date_deadline',Task2Archive, Date_deadline[Task2Archive])
-            if Task2Archive in MinDailyTaskDuration:
-                database.__delete_from_table__('MinDailyTaskDuration',Task2Archive, MinDailyTaskDuration[Task2Archive])
+                self.db.__delete_from_table__('Date_deadline',Task2Archive, Date_deadline[Task2Archive])
+            if Task2Archive in self.MinDailyTaskDuration:
+                self.db.__delete_from_table__('MinDailyTaskDuration',Task2Archive, MinDailyTaskDuration[Task2Archive])
         self.main.destroy()
 
     def SetDate(self):
@@ -278,17 +272,19 @@ class EditTask():
 
 
 class ActivateTask():
-    def __init__(self):
+    def __init__(self, db):
         self.main = Tk()
         self.main.title("Activate Task")
+        self.db = db
+        self.PausedTasks = db.get_tasks_for_table_('PausedTasks')
         
         ttk.Label(self.main, text='Paused Tasks').grid(row=0, column=0)
         self.listbox = Listbox(self.main, selectmode=EXTENDED)
         self.listbox.grid(row=1, column=0)
         self.width = 5
-        for key in PausedTasks:
+        for key in self.PausedTasks:
             self.listbox.insert(END,  '=='+key+'==')
-            for value in PausedTasks[key]:
+            for value in self.PausedTasks[key]:
                 self.listbox.insert(END, value)
                 if len(value)>self.width:
                     self.width = len(value)
@@ -300,22 +296,25 @@ class ActivateTask():
         selection = self.listbox.curselection()
         for i in selection:
             Task2Activate = self.listbox.get(i)
-            for key in PausedTasks:
+            for key in self.PausedTasks:
                 if Task2Activate == '=='+key+'==':
                     pass
                 else:
-                    for value in PausedTasks[key]:
+                    for value in self.PausedTasks[key]:
                         if value == Task2Activate:
                             project = key
-            database.__insert_in_table__('MainDailyGroups',project, Task2Activate)
-            database.__delete_from_table__('PausedTasks',project, Task2Activate)
+            self.db.__insert_in_table__('MainDailyGroups',project, Task2Activate)
+            self.db.__delete_from_table__('PausedTasks',project, Task2Activate)
         self.main.destroy()
 
 
 class SetEdit_MinimalDuration_Task():
-    def __init__(self):
+    def __init__(self, db):
         self.main = Tk()
         self.main.title("Minimal Task Duration Set/Edit")
+        self.db = db
+        MainDailyGroups = db.get_tasks_for_table_('MainDailyGroups')
+        self.MinDailyTaskDuration = db.get_tasks_for_table_('MinDailyTaskDuration')
         
         ttk.Label(self.main, text='Active Tasks').grid(row=0, column=0)    
         self.listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
@@ -334,11 +333,11 @@ class SetEdit_MinimalDuration_Task():
         self.tasks_min_duration_listbox.grid(row=1, column=1)
         self.tasks_min_duration_width = 10
 
-        if len(MinDailyTaskDuration)>0:
-            for key in MinDailyTaskDuration:
-                    self.tasks_min_duration_listbox.insert(END, key+'    '+MinDailyTaskDuration[key])
-                    if len(key)+len(MinDailyTaskDuration[key])>self.tasks_min_duration_width:
-                        self.tasks_min_duration_width = len(key)+len(MinDailyTaskDuration[key])
+        if len(self.MinDailyTaskDuration)>0:
+            for key in self.MinDailyTaskDuration:
+                    self.tasks_min_duration_listbox.insert(END, key+'    '+self.MinDailyTaskDuration[key])
+                    if len(key)+len(self.MinDailyTaskDuration[key])>self.tasks_min_duration_width:
+                        self.tasks_min_duration_width = len(key)+len(self.MinDailyTaskDuration[key])
             self.tasks_min_duration_listbox.config(width=self.tasks_min_duration_width, height=10)#, justify=CENTER)
 
         ttk.Label(self.main, text='Set/Edit Minimal Task Duration').grid(row=2, column=0)
@@ -357,19 +356,21 @@ class SetEdit_MinimalDuration_Task():
             for Task2Edit in ls_Tasks2Update:
                 duration = str(self.EntryTaskDuration.get())
                 if len(duration)>0 and duration != 'HH:MM':
-                    if Task2Edit not in MinDailyTaskDuration:
-                        database.__insert_in_table__('MinDailyTaskDuration',Task2Edit, str(duration))
-                        MinDailyTaskDuration[Task2Edit] = str(duration)
-                        database.__insert_in_table__('Days_task_active',Task2Edit, 0)
+                    if Task2Edit not in self.MinDailyTaskDuration:
+                        self.db.__insert_in_table__('MinDailyTaskDuration',Task2Edit, str(duration))
+                        self.MinDailyTaskDuration[Task2Edit] = str(duration)
+                        self.db.__insert_in_table__('Days_task_active',Task2Edit, 0)
                     else:
-                        database.__update_table__('MinDailyTaskDuration','min_duration_id', str(duration), 'task_id', Task2Edit)
+                        self.db.__update_table__('MinDailyTaskDuration','min_duration_id', str(duration), 'task_id', Task2Edit)
         self.main.destroy()
 
 
 class Edit_Task_Duration():
-    def __init__(self):
+    def __init__(self, db):
         self.main = Tk()
         self.main.title("Task Duration")
+        self.db = db
+        MainDailyGroups = db.get_tasks_for_table_('MainDailyGroups')
         
         ttk.Label(self.main, text='Active Tasks').grid(row=0, column=0)    
         self.listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
@@ -388,7 +389,7 @@ class Edit_Task_Duration():
         self.today_tasks_listbox.grid(row=1, column=1)
         self.today_tasks_width = 10
 
-        today_tasks_and_durations = database.get_tasks_duration_for_Dailydatabase()
+        today_tasks_and_durations = self.db.get_tasks_duration_for_Dailydatabase()
         if len(today_tasks_and_durations)>0:
             for task_active_today in today_tasks_and_durations:
                     self.today_tasks_listbox.insert(END, task_active_today+'    '+today_tasks_and_durations[task_active_today])
@@ -431,10 +432,10 @@ class Edit_Task_Duration():
     def EditDuration(self, task, duration2set, type):
         print(task, type, duration2set)
         if type == 'add':
-            duration = database.ComputeTaskDuration(task)
+            duration = self.db.ComputeTaskDuration(task)
             new_duration = duration2set+float(duration)
-            database.UpdateDailyTask(task, new_duration)
+            self.db.UpdateDailyTask(task, new_duration)
         else:
-            database.SetDailyTaskDuration(task, duration2set)
+            self.db.SetDailyTaskDuration(task, duration2set)
 
         self.main.destroy()

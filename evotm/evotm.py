@@ -322,32 +322,28 @@ class TMApp(Frame):
         self.button_dict[self._taskclosed].configure(bg = "green")
 
     def NewTask(self):
-        from bin import task_config
-        task_config.NewTask()
+        from bin.task_config import NewTask
+        NewTask(db)
 
     def EditTask(self):
         from bin import task_config
-        task_config.EditTask()
+        task_config.EditTask(db)
 
     def ActivateTask(self):
         from bin import task_config
-        task_config.ActivateTask()
+        task_config.ActivateTask(db)
 
     def SetEdit_MinimalDuration_Task(self):
         from bin import task_config
-        task_config.SetEdit_MinimalDuration_Task()
+        task_config.SetEdit_MinimalDuration_Task(db)
 
     def Configure(self):
         from bin import configuration
-        configuration.Configuration()
-
-    def SetDuration_MainDailyGroups(self):
-        from bin import task_config
-        task_config.SetDuration_MainDailyGroups()
+        configuration.Configuration(db)
 
     def Edit_Task_Duration(self):
         from bin import task_config
-        task_config.Edit_Task_Duration()
+        task_config.Edit_Task_Duration(db)
 
     def Show_Stats(self):
         from bin import make_stats
