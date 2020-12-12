@@ -136,8 +136,3 @@ class CalendarGoogle:
 if __name__ == '__main__':
     cal = CalendarGoogle()
     cal.list_events()
-
-
-
-
-

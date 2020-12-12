@@ -12,16 +12,29 @@ time.tzset()
 if version_info[0] >=3:
     from tkinter import Tk, ttk, Frame, Label, Button, Menu, StringVar
 else:
-    from Tkinter import Tk, ttk, Frame, Label, Button, Menu, StringVar
+    from Tkinter import Tk, Frame, Label, Button, Menu, StringVar
+    import ttk
 
 from bin import database
 from bin import update
 from setup.get_credentials_home import _get_credentials_home
-from calendar_google.calendar_google import CalendarGoogle
-MainDailyGroups = database.get_tasks_for_table_('MainDailyGroups')
-Days_task_active = database.get_tasks_for_table_('Days_task_active')
-MinDailyTaskDuration = database.get_tasks_for_table_('MinDailyTaskDuration')
-Tabs = database.get_tasks_for_table_('Tabs')
+from bin.database import DB
+
+cred_home = _get_credentials_home()
+db = DB(cred_home)
+try:
+    from calendar_google.calendar_google import CalendarGoogle    
+    cal = CalendarGoogle(cred_home, time_zone)
+    print('Connection with Google Calendar is ready')
+    google = True
+except Exception as e:
+    print('Importing Google Calendar didnt work. Please install: pip install googleapiclient google_auth_oauthlib', e)
+    google = False
+
+MainDailyGroups      = db.get_tasks_for_table_('MainDailyGroups')
+Days_task_active     = db.get_tasks_for_table_('Days_task_active')
+MinDailyTaskDuration = db.get_tasks_for_table_('MinDailyTaskDuration')
+Tabs                 = db.get_tasks_for_table_('Tabs')
 
 ls_MainDailyGroups = []
 ls_sorting_order_from_tabs = []
@@ -32,8 +45,6 @@ for order in sorted(ls_sorting_order_from_tabs):
         if Tabs[tab] == order:
             ls_MainDailyGroups.append(tab)
 
-cred_home = _get_credentials_home()
-cal = CalendarGoogle(cred_home, time_zone)
 
 class TMApp(Frame):
     def __init__(self, parent, *args, **kwargs):  
@@ -88,15 +99,15 @@ class TMApp(Frame):
     def check_today(self):
         today = datetime.today().strftime("%Y%m%d")
 #        today = datetime.strptime(datetime.today().strftime("%Y%m%d"), "%Y%m%d").strftime("%Y%m%d")
-        d_tasks = database.get_tasks_for_table_('Dailydatabase')
+        d_tasks = db.get_tasks_for_table_('Dailydatabase')
         ls_tasks = []
         if len(d_tasks)>0:
             for key in d_tasks:
                 ls_tasks.append(key)
             if d_tasks[ls_tasks[0]][0][1] != today:
                 print('starting update', d_tasks[ls_tasks[0]][0][1], today)
-                database.Update_DB()
-                update.send_to_thread_update()
+                db.Update_DB()
+                update.send_to_thread_update(db)
 
 
     def SetProjectDuration(self):
@@ -115,7 +126,7 @@ class TMApp(Frame):
 
 
     def ListButtons(self):
-        Date_deadline = database.get_tasks_for_table_('Date_deadline')
+        Date_deadline = db.get_tasks_for_table_('Date_deadline')
         col=0
         for project in ls_MainDailyGroups:
             rownr = 2
@@ -196,20 +207,21 @@ class TMApp(Frame):
 
 
     def SetButtonColor(self, task):
+        color_button = "grey"
         for key in MainDailyGroups:
             for value in MainDailyGroups[key]:
                 if value == task:
                     Project = key
         if task in MinDailyTaskDuration:
-            if database.task_in_table('Dailydatabase', task):
-                    duration = float(database.ComputeTaskDuration(task))
+            if db.task_in_table('Dailydatabase', task):
+                    duration = float(db.ComputeTaskDuration(task))
                     if str(time.strftime('%H:%M:%S', time.gmtime(float(duration)))) > MinDailyTaskDuration[task]:
                         color_button = 'grey'
                     else:
                         color_button = 'firebrick'
             else:
                     color_button = 'firebrick'
-        elif database.task_in_table('Dailydatabase', task):
+        elif db.task_in_table('Dailydatabase', task):
                 color_button = 'grey'
         else:
             if platform == 'win32':
@@ -249,7 +261,7 @@ class TMApp(Frame):
             self._elapsedtime = time.time() - self._start
             self._setTime(self._elapsedtime)
             self._running = 0
-            database.UpdateDailyTask(self._taskrunning, self._elapsedtime)
+            db.UpdateDailyTask(self._taskrunning, self._elapsedtime)
             self.CalendarGoogleUpdate()
 
 
@@ -268,25 +280,26 @@ class TMApp(Frame):
             ls = MainDailyGroups[key]
             if any(task in i for i in ls):
                 self._Projectrunning = key
-        self._TotalTaskDuration = database.ComputeTaskDuration(task)
+        self._TotalTaskDuration = db.ComputeTaskDuration(task)
         self.ProjectDuration(self._Projectrunning)
         self.SetProjectDuration()
         self._taskrunning = task
-        database.UpdateStartTime(self._taskrunning, time.strftime('%H:%M:%S', time.localtime(time.time())))
+        db.UpdateStartTime(self._taskrunning, time.strftime('%H:%M:%S', time.localtime(time.time())))
         self.Start()
         self.button_dict[task].configure(bg = "green")
         self._taskclosed = self._taskrunning
 
     def CalendarGoogleUpdate(self):
-        project = database.get_values_for_task_('Projects',self._taskrunning,'project_id')[0][0]
+        project = db.get_values_for_task_('Projects',self._taskrunning,'project_id')[0][0]
         if self._elapsedtime > self.mincal:
             cal_entrance = '{}| {}'.format(project, self._taskrunning)
             now = datetime.now()
             start_time = (now - timedelta(seconds = self._elapsedtime)).isoformat()
-            cal.create_event(cal_entrance, start_time, now.isoformat())
+            if google:
+                cal.create_event(cal_entrance, start_time, now.isoformat())
 
     def ProjectDuration(self, project):
-        self._TotalProjectDuration = database.ComputeProjectDuration(project)
+        self._TotalProjectDuration = db.ComputeProjectDuration(project)
         return  self._TotalProjectDuration
 
 
@@ -296,8 +309,8 @@ class TMApp(Frame):
         self.Stop()
         self.Reset()
         time.sleep(4)
-        database.Update_DB()
-        update.send_to_thread_update()
+        db.Update_DB()
+        update.send_to_thread_update(db)
 
         for Group in MainDailyGroups:
             for task in MainDailyGroups[Group]:
@@ -339,11 +352,11 @@ class TMApp(Frame):
     def Show_Stats(self):
         from bin import make_stats
         make_stats.Show_Stats()
-        database.retrieve_all_data(path.join(environ["HOMEPATH"], "Desktop",'db_Database.csv'))
+        db.retrieve_all_data(path.join(environ["HOMEPATH"], "Desktop",'db.csv'))
 
 def on_closing():
         print('closing app and database')
-        database.__close_db_()
+        db.close_db()
         app.destroy()
 
 app = Tk()
