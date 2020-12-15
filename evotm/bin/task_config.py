@@ -1,7 +1,7 @@
 '''script for configuring tasks
 '''
 
-from tkinter import Tk, ttk, Label, Button, Entry, Listbox, EXTENDED, END, simpledialog, StringVar, Menu
+from tkinter import Tk, ttk, Label, Button, Entry, Listbox, EXTENDED, END, MULTIPLE, simpledialog, StringVar, Menu
 from os import listdir, rename, path
 import time, re
 
@@ -56,30 +56,33 @@ class NewTask():
         self.main = Tk()
         self.main.title("Add Task")
         self.db = db
-        MainDailyGroups = db.get_tasks_for_table_('MainDailyGroups')
+        self.MainDailyGroups = db.get_tasks_for_table_('MainDailyGroups')
         Projects = db.get_tasks_for_table_('Projects')
 
-        ttk.Label(self.main, text='Main Daily Groups').grid(row=0, column=0)
-        self.maindaily_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
-        self.maindaily_listbox.grid(row=1, column=0)
-        width = 5
-        for item in MainDailyGroups:
-            self.maindaily_listbox.insert(END, item)
-            if len(item)>width:
-                width = len(item)
-        self.maindaily_listbox.config(width=width, height=len(MainDailyGroups))
-        
-        ttk.Label(self.main, text='Projects').grid(row=0, column=1)
-        self.project_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
-        self.project_listbox.grid(row=1, column=1)
-        self.project_width = width
+        row = 0
+        col = 0        
+        ttk.Label(self.main, text='Projects').grid(row=row, column=col)
+        self.project_listbox = Listbox(self.main, selectmode=MULTIPLE, exportselection=0)
+        self.project_listbox.grid(row=row+1, column=col)
         self.ls_projects = [i for i in Projects]  # Projects are being sent to list because this methods allows immediate updating of the tk frame
-        if len(self.ls_projects)>0:
+        self.project_width = 5
+        if len(self.ls_projects) > 0:
+            self.project_width = len(max(self.ls_projects, key = len))
             for item in self.ls_projects:
                 self.project_listbox.insert(END, item)
-                if len(item) > self.project_width:
-                    self.project_width = len(item)
         self.project_listbox.config(width=self.project_width, height=len(self.ls_projects))
+        col += 1
+
+        if len(self.MainDailyGroups) > 1:
+            ttk.Label(self.main, text='Main Daily Groups').grid(row=row, column=col)
+            self.maindaily_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
+            self.maindaily_listbox.grid(row=row+1, column=col)
+            width = len(max(self.MainDailyGroups, key = len))
+            for item in self.MainDailyGroups:
+                self.maindaily_listbox.insert(END, item)
+                if len(item)>width:
+                    width = len(item)
+            self.maindaily_listbox.config(width=width, height=len(self.MainDailyGroups))
 
         self.EntryTask = Entry(self.main)
         self.EntryTask.grid(row=2, column=0)
@@ -92,22 +95,28 @@ class NewTask():
         ttk.Button(self.main, text='New Project', command=self.NewProject).grid(row=3, column=1)
 
     def select(self):
-        Task2Add = str(self.EntryTask.get())
-        ls_selected_maindaily = list()
         ls_selected_projects = list()
-        selected_maindaily = self.maindaily_listbox.curselection()
+        if len(self.MainDailyGroups) > 1:
+            selected_maindaily = self.maindaily_listbox.curselection()
+            for i in selected_maindaily:
+                entrada = self.maindaily_listbox.get(i)
+                ls_selected_maindaily.append(entrada)
+        else:
+            ls_selected_maindaily = ['tab']
+        print(ls_selected_maindaily)
+
         selected_project = self.project_listbox.curselection()
-        for i in selected_maindaily:
-            entrada = self.maindaily_listbox.get(i)
-            ls_selected_maindaily.append(entrada)
         for i in selected_project:
             entrada = self.project_listbox.get(i)
             ls_selected_projects.append(entrada)
+        print(ls_selected_projects)
+
+        Task2Add = str(self.EntryTask.get())
 
         for maindailygroup in ls_selected_maindaily:
             self.db.__insert_in_table__('MainDailyGroups', maindailygroup, Task2Add)
             self.db.__insert_in_table__('Days_task_active', Task2Add, 0)
-        if len(ls_selected_projects)>0:
+        if len(ls_selected_projects) > 0:
             for project in ls_selected_projects:
                 self.db.__insert_in_table__('Projects', project, Task2Add)
 

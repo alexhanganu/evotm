@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="evotm",
-    version="0.0.1",
+    version="0.0.1.1",
     author="Alexandru Hanganu",
     author_email="alexandru.hanganu@umontreal.ca",
     description="Time and Task management app with Google Calendar link",
