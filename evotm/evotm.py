@@ -83,7 +83,6 @@ class TMApp(Frame):
 
         self.button_dict = {}
         self.button_days_task_active_dict = {}
-        self.maxlength = 5
         self.row_nr = 0
         self.col_nr = 1
 
@@ -128,21 +127,24 @@ class TMApp(Frame):
     def ListButtons(self):
         Date_deadline = db.get_tasks_for_table_('Date_deadline')
         col=0
-        for project in ls_MainDailyGroups:
+        for group in ls_MainDailyGroups:
+            ls_tasks = MainDailyGroups[group]
             rownr = 2
-            maxlength = 3
+            width = len(max(ls_tasks, key = len))# 3
             task_in_minimum_daily = False
             task_in_date_deadline = False
-            if len(MainDailyGroups[project])>0:
-                Label(self, textvariable=self.Project_Duration_Now[project]).grid(row=1, column=col)
+            if len(ls_tasks)>0:
+                Label(self, textvariable=self.Project_Duration_Now[group]).grid(row=1, column=col)
 
-            for task in MainDailyGroups[project]:
-                if len(task) > maxlength:
-                    maxlength = len(task)
-            self.maxlength = self.maxlength+maxlength
-            for task in MainDailyGroups[project]:
+            # for task in ls_tasks:
+            #     if len(task) > width:
+            #         width = len(task)
+            # self.maxlength = self.maxlength+width !!!!!!!!!!!!!!!seems that this line is not required and can be removed (20201215)
+            Projects = db.get_tasks_for_table_('Projects')
+            for task in ls_tasks:
+                proj = '| '.join([i for i in Projects.keys() if task in Projects[i]])
                 action = lambda x = task: self.SetTask(x)
-                self.button_dict[task] = Button(self, height=1, width=maxlength, text=task, command=action)
+                self.button_dict[task] = Button(self, height=1, width=width, text='{}| {}'.format(proj, task), command=action)
                 self.button_dict[task].grid(row=rownr, column=col)
                 self.button_dict[task].configure(bg = self.SetButtonColor(task))
                 if task in MinDailyTaskDuration:
@@ -159,12 +161,12 @@ class TMApp(Frame):
                     else:
                         self.button_days_task_active_dict[task].configure(bg = 'orange')
                 rownr += 1
-                if project == ls_MainDailyGroups[0]:
+                if group == ls_MainDailyGroups[0]:
                     if task_in_minimum_daily or task_in_date_deadline:
                         self.nr_of_col_4_widget = 2
                     else:
                         self.nr_of_col_4_widget = 1
-                elif project == ls_MainDailyGroups[-1]:
+                elif group == ls_MainDailyGroups[-1]:
                     self.col_nr_4_stop_button = col
             if task_in_minimum_daily or task_in_date_deadline:
                 col += 2
@@ -324,6 +326,8 @@ class TMApp(Frame):
     def NewTask(self):
         from bin.task_config import NewTask
         NewTask(db)
+        self.ListButtons() #!!!!! intending to update the list of buttons after adding a New Task but does not work for now
+
 
     def EditTask(self):
         from bin import task_config

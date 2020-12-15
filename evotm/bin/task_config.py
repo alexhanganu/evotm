@@ -72,13 +72,14 @@ class NewTask():
         ttk.Label(self.main, text='Projects').grid(row=0, column=1)
         self.project_listbox = Listbox(self.main, selectmode=EXTENDED, exportselection=0)
         self.project_listbox.grid(row=1, column=1)
-        project_width = width
-        if len(Projects)>0:
-            for item in Projects:
+        self.project_width = width
+        self.ls_projects = [i for i in Projects]  # Projects are being sent to list because this methods allows immediate updating of the tk frame
+        if len(self.ls_projects)>0:
+            for item in self.ls_projects:
                 self.project_listbox.insert(END, item)
-                if len(item) > project_width:
-                    project_width = len(item)
-        self.project_listbox.config(width=project_width, height=len(Projects))
+                if len(item) > self.project_width:
+                    self.project_width = len(item)
+        self.project_listbox.config(width=self.project_width, height=len(self.ls_projects))
 
         self.EntryTask = Entry(self.main)
         self.EntryTask.grid(row=2, column=0)
@@ -119,9 +120,9 @@ class NewTask():
     def NewProject(self):
         project = simpledialog.askstring("askstring", "Enter New Project")
         self.db.__insert_in_table__('Projects',project, '')
-        self.ls.append(project)
+        self.ls_projects.append(project)
         self.project_listbox.insert(END, project)
-        self.project_listbox.config(width=self.width, height=len(self.ls))
+        self.project_listbox.config(width=self.project_width, height=len(self.ls_projects))
 
     def SetDate(self):
         cd = CalendarDialog(self.main)
