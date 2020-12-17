@@ -127,19 +127,14 @@ class TMApp(Frame):
     def ListButtons(self):
         Date_deadline = db.get_tasks_for_table_('Date_deadline')
         col=0
+        task_in_minimum_daily = False
+        task_in_date_deadline = False
         for group in ls_MainDailyGroups:
             ls_tasks = MainDailyGroups[group]
             rownr = 2
             width = len(max(ls_tasks, key = len))# 3
-            task_in_minimum_daily = False
-            task_in_date_deadline = False
             if len(ls_tasks)>0:
                 Label(self, textvariable=self.Project_Duration_Now[group]).grid(row=1, column=col)
-
-            # for task in ls_tasks:
-            #     if len(task) > width:
-            #         width = len(task)
-            # self.maxlength = self.maxlength+width !!!!!!!!!!!!!!!seems that this line is not required and can be removed (20201215)
             Projects = db.get_tasks_for_table_('Projects')
             for task in ls_tasks:
                 proj = '| '.join([i for i in Projects.keys() if task in Projects[i]])
