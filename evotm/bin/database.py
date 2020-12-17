@@ -1,8 +1,9 @@
 from sqlite3 import connect, OperationalError
 from os import environ, path
 from time import strftime, localtime, gmtime
+from .utils import DEFAULT
 
-first_tab_name = 'tab'
+
 TABLES = {
     'Tabs'                     : ('tab_id',         'position'),
     'Database'                 : ('day_of_week_id', 'date_id', 'task_id', 'duration_id', 'starttime_id'),
@@ -58,7 +59,7 @@ class DB:
         conn.execute('''CREATE TABLE if not exists MainDailyGroups_bg_color (dailygroup_id, color_id)''')
         if conn.execute('''SELECT count(*) from Tabs ''').fetchone()[0] == 0:
             print('len Tabs is zero, creating tab')
-            conn.execute('''INSERT INTO Tabs VALUES(?,?)''', [first_tab_name,'0'])
+            conn.execute('''INSERT INTO Tabs VALUES(?,?)''', [DEFAULT.first_tab,'0'])
         conn.commit()
 
     def Update_DB(self):

@@ -102,7 +102,7 @@ class NewTask():
                 entrada = self.maindaily_listbox.get(i)
                 ls_selected_maindaily.append(entrada)
         else:
-            ls_selected_maindaily = ['tab']
+            ls_selected_maindaily = self.MainDailyGroups[0]
         print(ls_selected_maindaily)
 
         selected_project = self.project_listbox.curselection()
