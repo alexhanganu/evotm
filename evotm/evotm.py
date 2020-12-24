@@ -6,6 +6,8 @@ from os import listdir, getcwd, path, environ
 from sys import version_info, platform
 from datetime import date, datetime, timedelta
 import time
+from bin.utils import DEFAULT
+
 environ['TZ'] = 'US/Eastern'
 time.tzset()
 
@@ -132,8 +134,9 @@ class TMApp(Frame):
         for group in ls_MainDailyGroups:
             ls_tasks = MainDailyGroups[group]
             rownr = 2
-            width = len(max(ls_tasks, key = len))# 3
+            width = DEFAULT.tab_width
             if len(ls_tasks)>0:
+                width = len(max(ls_tasks, key = len))
                 Label(self, textvariable=self.Project_Duration_Now[group]).grid(row=1, column=col)
             Projects = db.get_tasks_for_table_('Projects')
             for task in ls_tasks:

@@ -25,7 +25,7 @@ class DB:
         self.home = credentials_home
 
     def __connect_db__(self):
-        db = path.join(self.home, 'tm.db')
+        db = path.join(self.home, 'evotm.db')
         conn = connect(db, check_same_thread=False)
         try:
             self.__get_table_(conn)
@@ -42,24 +42,24 @@ class DB:
             self.__create_table__(conn)
         return ls_tables
     def __create_table__(self, conn):
-        # for table in TABLES:
-        #         conn.execute('''CREATE TABLE if not exists {} {}'''.format(table, TABLES[table]))
+        for table in TABLES:
+                conn.execute('''CREATE TABLE if not exists {} {}'''.format(table, TABLES[table]))
 
-        conn.execute('''CREATE TABLE if not exists Tabs (tab_id, position)''')
-        conn.execute('''CREATE TABLE if not exists Database (day_of_week_id, date_id, task_id, duration_id, starttime_id)''')
-        conn.execute('''CREATE TABLE if not exists MainDailyGroups (dailygroup_id, task_id)''')
-        conn.execute('''CREATE TABLE if not exists Projects (project_id, task_id)''')
-        conn.execute('''CREATE TABLE if not exists Days_task_active (task_id, days_task_active_id)''')
-        conn.execute('''CREATE TABLE if not exists MinDailyTaskDuration (task_id, min_duration_id)''')
-        conn.execute('''CREATE TABLE if not exists Date_deadline (task_id, date_id)''')
-        conn.execute('''CREATE TABLE if not exists PausedTasks (dailygroup_id, task_id)''')
-        conn.execute('''CREATE TABLE if not exists ArchivedTasks (dailygroup_id, task_id)''')
-        conn.execute('''CREATE TABLE if not exists Dailydatabase (day_of_week_id, date_id, task_id, duration_id)''')
-        conn.execute('''CREATE TABLE if not exists DailyStartTime (date_id, task_id, starttime_id)''')
-        conn.execute('''CREATE TABLE if not exists MainDailyGroups_bg_color (dailygroup_id, color_id)''')
+        # conn.execute('''CREATE TABLE if not exists Tabs (tab_id, position)''')
+        # conn.execute('''CREATE TABLE if not exists Database (day_of_week_id, date_id, task_id, duration_id, starttime_id)''')
+        # conn.execute('''CREATE TABLE if not exists MainDailyGroups (dailygroup_id, task_id)''')
+        # conn.execute('''CREATE TABLE if not exists Projects (project_id, task_id)''')
+        # conn.execute('''CREATE TABLE if not exists Days_task_active (task_id, days_task_active_id)''')
+        # conn.execute('''CREATE TABLE if not exists MinDailyTaskDuration (task_id, min_duration_id)''')
+        # conn.execute('''CREATE TABLE if not exists Date_deadline (task_id, date_id)''')
+        # conn.execute('''CREATE TABLE if not exists PausedTasks (dailygroup_id, task_id)''')
+        # conn.execute('''CREATE TABLE if not exists ArchivedTasks (dailygroup_id, task_id)''')
+        # conn.execute('''CREATE TABLE if not exists Dailydatabase (day_of_week_id, date_id, task_id, duration_id)''')
+        # conn.execute('''CREATE TABLE if not exists DailyStartTime (date_id, task_id, starttime_id)''')
+        # conn.execute('''CREATE TABLE if not exists MainDailyGroups_bg_color (dailygroup_id, color_id)''')
         if conn.execute('''SELECT count(*) from Tabs ''').fetchone()[0] == 0:
             print('len Tabs is zero, creating tab')
-            conn.execute('''INSERT INTO Tabs VALUES(?,?)''', [DEFAULT.first_tab,'0'])
+            conn.execute('''INSERT INTO Tabs VALUES(?,?)''', [DEFAULT.tab1,'0'])
         conn.commit()
 
     def Update_DB(self):

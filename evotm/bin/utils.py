@@ -3,5 +3,6 @@
 class DEFAULT(object):
     '''Default values'''
 
-    first_tab  = 'j' # job related tasks
-    second_tab = 'p' # personal tasks
+    tab1 = 'j' # job related tasks
+    tab2 = 'p' # personal tasks
+    tab_width = 5
